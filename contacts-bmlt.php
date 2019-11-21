@@ -325,6 +325,10 @@ if (!class_exists("contactsBmlt")) {
         {
             $serviceBodiesURL =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetServiceBodies"));
             $serviceBodies_results = json_decode($serviceBodiesURL, true);
+            
+            usort($serviceBodies_results, function ($a, $b) {
+                return strnatcasecmp($a['name'], $b['name']);
+            });
 
             return $serviceBodies_results;
         }
@@ -391,7 +395,7 @@ if (!class_exists("contactsBmlt")) {
                                 }
 
                                 if ($name) {
-                                    $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_div">' : '<tr class="bmlt_simple_contact_one_contact_tr">';
+                                    $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_div bmlt_alt_'.intval($alt).'">' : '<tr class="bmlt_simple_contact_one_contact_tr bmlt_alt_'.intval($alt).'">';
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_service_body_name_div">' : '<td class="bmlt_simple_contact_one_contact_service_body_name_td">';
                                     $ret .= $service_body_name;
