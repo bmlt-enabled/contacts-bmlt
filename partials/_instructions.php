@@ -27,4 +27,10 @@
         <p>To change the display type add display_type="table" there are three different types <strong>simple</strong>, <strong>table</strong>, <strong>block</strong></p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; display_type=&quot;table&quot;]</p>
     </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- parent_id</strong></h3>
+    <div>
+        <p><strong>parent_id</strong></p>
+        <p>This will only display service bodies who has set parent_id.</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; parent_id=&quot;22&quot;]</p>
+    </div>
 </div>

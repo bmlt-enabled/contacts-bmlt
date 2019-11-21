@@ -125,11 +125,12 @@ if (!class_exists("contactsBmlt")) {
             return $results;
         }
 
-        public function contactsBmltMain($atts, $content = null)
+        public function contactsBmltMain($atts, $content = null, $parent_id = null)
         {
             extract(shortcode_atts(array(
                 "root_server"   => '',
-                'display_type'  => ''
+                'display_type'  => '',
+                'parent_id'     => ''
             ), $atts));
 
             $root_server          = ($root_server   != '' ? $root_server   : $this->options['root_server']);
@@ -144,7 +145,7 @@ if (!class_exists("contactsBmlt")) {
 
             $output .= "<style type='text/css'>$css_um</style>";
 
-            $service_body_results = $this->getServiceBodiesJson($root_server);
+            $service_body_results = $this->getServiceBodiesJson($root_server, $parent_id);
 
             if ($display_type != '' && $display_type == 'table') {
                 $output .= '<div id="contacts_bmlt_div">';
@@ -319,18 +320,31 @@ if (!class_exists("contactsBmlt")) {
 
         /**
          * @param $root_server
-         * @return string
+         * @param null $parent_id
+         * @return array
          */
-        public function getServiceBodiesJson($root_server)
+        public function getServiceBodiesJson($root_server, $parent_id = null)
         {
             $serviceBodiesURL =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetServiceBodies"));
             $serviceBodies_results = json_decode($serviceBodiesURL, true);
-            
-            usort($serviceBodies_results, function ($a, $b) {
+
+            $output = array();
+
+            if (isset($parent_id) && is_numeric($parent_id)) {
+                foreach ($serviceBodies_results as &$serviceBody) {
+                    if ($serviceBody['parent_id'] == $parent_id || $serviceBody['id'] == $parent_id) {
+                        $output[] = $serviceBody;
+                    }
+                }
+            } else {
+                $output = $serviceBodies_results;
+            }
+
+            usort($output, function ($a, $b) {
                 return strnatcasecmp($a['name'], $b['name']);
             });
 
-            return $serviceBodies_results;
+            return $output;
         }
 
         /*******************************************************************/
