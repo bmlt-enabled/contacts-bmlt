@@ -33,4 +33,9 @@
         <p>This will only display service bodies who has set parent_id.</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; parent_id=&quot;22&quot;]</p>
     </div>
+    <div>
+        <p><strong>show_description</strong></p>
+        <p>This will display the service bodies description underneath the name if set..</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_description=&quot;1&quot;]</p>
+    </div>
 </div>

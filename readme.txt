@@ -32,6 +32,9 @@ Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; di
 **parent_id** This will only display service bodies who has set parent_id.
 Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; parent_id=&quot;22&quot;]
 
+**show_description** This will display the service bodies description underneath the name if set.
+Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_description=&quot;1&quot;]
+
 
 == EXAMPLES ==
 

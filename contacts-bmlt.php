@@ -128,9 +128,10 @@ if (!class_exists("contactsBmlt")) {
         public function contactsBmltMain($atts, $content = null, $parent_id = null)
         {
             extract(shortcode_atts(array(
-                "root_server"   => '',
-                'display_type'  => '',
-                'parent_id'     => ''
+                "root_server"       => '',
+                'display_type'      => '',
+                'parent_id'         => '',
+                'show_description'  => ''
             ), $atts));
 
             $root_server          = ($root_server   != '' ? $root_server   : $this->options['root_server']);
@@ -353,20 +354,20 @@ if (!class_exists("contactsBmlt")) {
          * \returns XHTML data. It will either be a table, or block elements.
          * @param $results
          * @param bool $in_block
-         * @param null $in_container_id
+         * @param null $show_description
          * @return string
          */
         public function serviceBodiesJson2Html(
-            $results,               ///< The results.
-            $in_block = false,      ///< If this is true, the results will be sent back as block elements (div tags), as opposed to a table. Default is false.
-            $in_container_id = null ///< This is an optional ID for the "wrapper."
+            $results,                ///< The results.
+            $in_block = false,       ///< If this is true, the results will be sent back as block elements (div tags), as opposed to a table. Default is false.
+            $show_description = null //
         ) {
             $ret = '';
 
             // What we do, is to parse the JSON return. We'll pick out certain fields, and format these into a table or block element return.
             if ($results) {
                 if (is_array($results) && count($results)) {
-                    $ret = $in_block ? '<div class="bmlt_simple_contacts_div"'.($in_container_id ? ' id="'.htmlspecialchars($in_container_id).'"' : '').'>' : '<table class="bmlt_simple_contacts_table"'.($in_container_id ? ' id="'.htmlspecialchars($in_container_id).'"' : '').' cellpadding="0" cellspacing="0" summary="Contactss">';
+                    $ret = $in_block ? '<div class="bmlt_simple_contacts_div">' : '<table class="bmlt_simple_contacts_table" cellpadding="0" cellspacing="0" summary="Contacts">';
                     $result_keys = array();
                     foreach ($results as $sub) {
                         $result_keys = array_merge($result_keys, $sub);
@@ -413,6 +414,11 @@ if (!class_exists("contactsBmlt")) {
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_service_body_name_div">' : '<td class="bmlt_simple_contact_one_contact_service_body_name_td">';
                                     $ret .= $service_body_name;
+                                    if ($show_description = "1") {
+                                        $ret .= '<div class="bmlt_simple_contact_one_contact_service_body_description_div">';
+                                        $ret .= $description;
+                                        $ret .= '</div>';
+                                    }
                                     $ret .= $in_block ? '</div>' : '</td>';
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_helpline_div">' : '<td class="bmlt_simple_contact_one_contact_helpline_td">';
