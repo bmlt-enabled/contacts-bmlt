@@ -26,7 +26,7 @@ A minimum of root_server needs to be set.
 
 Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot;]
 
-**display_type** To change the display type add display_type=&quot;table&quot; there are two different types **table**, **block**
+**display_type** To change the display type add display_type=&quot;table&quot; there are two different types **table**, **block** the default is table.
 Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; display_type=&quot;table&quot;]
 
 **parent_id** This will only display service bodies who has set parent_id.
@@ -34,6 +34,18 @@ Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; pa
 
 **show_description** This will display the service bodies description underneath the name if set.
 Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_description=&quot;1&quot;]
+
+**show_email** This will display the service bodies contact email underneath the name if set.
+Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_email=&quot;1&quot;]
+
+**show_url_in_name** This will add a link to the service body name, this is the default action. To remove the url from the service body name add show_url_in_name=&quot;0quot;.
+Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_url_in_name=&quot;0&quot;]
+
+**show_tel_url** This will add a tel link to the telephone number. Default is to not add it.
+Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_tel_url=&quot;1&quot;]
+
+**show_full_url** This will add a separate column or div with the full url displayed. Default is to not add it.
+Ex. Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_full_url=&quot;1&quot;]
 
 
 == EXAMPLES ==

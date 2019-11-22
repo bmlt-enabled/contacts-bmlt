@@ -21,12 +21,6 @@ if (!class_exists("contactsBmlt")) {
     {
         public $optionsName = 'contacts_bmlt_options';
         public $options = array();
-        const HTTP_RETRIEVE_ARGS = array(
-            'headers' => array(
-                'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0) +ContactsBMLT'
-            ),
-            'timeout' => 60
-        );
         public function __construct()
         {
             $this->getOptions();
@@ -129,9 +123,13 @@ if (!class_exists("contactsBmlt")) {
         {
             extract(shortcode_atts(array(
                 "root_server"       => '',
-                'display_type'      => '',
+                'display_type'      => 'table',
                 'parent_id'         => '',
-                'show_description'  => ''
+                'show_description'  => '0',
+                'show_url_in_name'  => '1',
+                'show_tel_url'      => '0',
+                'show_email'        => '0',
+                'show_full_url'     => '0'
             ), $atts));
 
             $root_server          = ($root_server   != '' ? $root_server   : $this->options['root_server']);
@@ -150,28 +148,16 @@ if (!class_exists("contactsBmlt")) {
 
             if ($display_type != '' && $display_type == 'table') {
                 $output .= '<div id="contacts_bmlt_div">';
-                $output .= $this->serviceBodiesJson2Html($service_body_results, false);
+                $output .= $this->serviceBodiesJson2Html($service_body_results, false, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url);
                 $output .= '</div>';
             }
 
             if ($display_type != '' && $display_type == 'block') {
                 $output .= '<div id="contacts_bmlt_div">';
-                $output .= $this->serviceBodiesJson2Html($service_body_results, true);
+                $output .= $this->serviceBodiesJson2Html($service_body_results, true, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url);
                 $output .= '</div>';
             }
 
-            if ($display_type != 'table' && $display_type != 'block') {
-                foreach ($service_body_results as $serviceBody) {
-                    $output .= "<div class='contacts-bmlt-time-meeting-name'>" . date('g:i A', strtotime($serviceBody['start_time'])) . "&nbsp;&nbsp;&nbsp;" .$serviceBody['serviceBody_name'] . "</div>";
-                    if ($location_text) {
-                        $output .= "<div class='contacts-bmlt-location-text'>" . $serviceBody['location_text'] . "</div>";
-                    }
-                    $output .= "<div class='contacts-bmlt-location-address'>" . $serviceBody['location_street'] . "&nbsp;&nbsp;&nbsp;" . $serviceBody['location_municipality'] . ",&nbsp;" . $serviceBody['location_province'] . "&nbsp;" . $serviceBody['location_postal_code_1'] . '</div>';
-                    $output .= "<div class='contacts-bmlt-formats-location-info-comments'>" . $serviceBody['formats'] . "&nbsp;&nbsp;&nbsp;" . $serviceBody['location_info'] . "&nbsp;" . $serviceBody['comments'] . '</div>';
-                    $output .= "<div class='contacts-bmlt-map-link'>" . "<a href='https://maps.google.com/maps?q=" . $serviceBody['latitude'] . "," . $serviceBody['longitude'] . "' target='new'>Map</a></div>";
-                    $output .= "<div class='contacts-bmlt-break'>&nbsp;</div>";
-                }
-            }
             return $output;
         }
 
@@ -355,12 +341,20 @@ if (!class_exists("contactsBmlt")) {
          * @param $results
          * @param bool $in_block
          * @param null $show_description
+         * @param null $show_url_in_name
+         * @param null $show_tel_url
+         * @param null $show_email
+         * @param null $show_full_url
          * @return string
          */
         public function serviceBodiesJson2Html(
-            $results,                ///< The results.
-            $in_block = false,       ///< If this is true, the results will be sent back as block elements (div tags), as opposed to a table. Default is false.
-            $show_description = null //
+            $results,                 ///< The results.
+            $in_block = false,        ///< If this is true, the results will be sent back as block elements (div tags), as opposed to a table. Default is false.
+            $show_description = null, //
+            $show_url_in_name = null, //
+            $show_tel_url = null,     //
+            $show_email = null,       //
+            $show_full_url = null     //
         ) {
             $ret = '';
 
@@ -389,24 +383,26 @@ if (!class_exists("contactsBmlt")) {
                                 if (count($serviceBody) > count($keys)) {
                                     $keys[] = 'unused';
                                 }
-                                $phoneNumber = '';
-                                $service_body_name = '';
+
                                 // This is for convenience. We turn the serviceBody array into an associative one by adding the keys.
                                 $serviceBody = array_combine($keys, $serviceBody);
                                 $url = htmlspecialchars(trim(stripslashes($serviceBody['url'])));
+                                $strip_url = rtrim(str_replace(array('http://','https://'), '', $url), '/');
                                 $helpline = htmlspecialchars(trim(stripslashes($serviceBody['helpline'])));
                                 $contact_email = htmlspecialchars(trim(stripslashes($serviceBody['contact_email'])));
                                 $description = htmlspecialchars(trim(stripslashes($serviceBody['description'])));
                                 $name = htmlspecialchars(trim(stripslashes($serviceBody['name'])));
 
-                                if ($url) {
+                                if ($url && $show_url_in_name == "1") {
                                     $service_body_name = '<span class="bmlt_simple_list_service_body_name_text"><a href="' . $url . '">' . $name . '</a></span>';
                                 } else {
                                     $service_body_name = '<span class="bmlt_simple_list_service_body_name_text">' . $name . '</span>';
                                 }
 
-                                if ($helpline) {
-                                    $phoneNumber = "<span class=\"bmlt_simple_list_helpline_text\">$helpline</span>";
+                                if ($helpline && $show_tel_url =="1") {
+                                    $phoneNumber = '<span class=\"bmlt_simple_list_helpline_text\"><a href="tel:' . $helpline . '">' . $helpline . '</a></span>';
+                                } else {
+                                    $phoneNumber = '<span class=\"bmlt_simple_list_helpline_text\">' . $helpline . '</span>';
                                 }
 
                                 if ($name) {
@@ -414,7 +410,12 @@ if (!class_exists("contactsBmlt")) {
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_service_body_name_div">' : '<td class="bmlt_simple_contact_one_contact_service_body_name_td">';
                                     $ret .= $service_body_name;
-                                    if ($show_description = "1") {
+                                    if ($contact_email && $show_email == "1") {
+                                        $ret .= '<div class="bmlt_simple_contact_one_contact_service_body_contact_email_div">';
+                                        $ret .= $contact_email;
+                                        $ret .= '</div>';
+                                    }
+                                    if ($description && $show_description == "1") {
                                         $ret .= '<div class="bmlt_simple_contact_one_contact_service_body_description_div">';
                                         $ret .= $description;
                                         $ret .= '</div>';
@@ -425,6 +426,11 @@ if (!class_exists("contactsBmlt")) {
                                     $ret .= $phoneNumber;
                                     $ret .= $in_block ? '</div>' : '</td>';
 
+                                    if ($show_full_url == "1") {
+                                        $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_url_div">' : '<td class="bmlt_simple_contact_one_contact_url_td">';
+                                        $ret .= '<a href="' . $url . '">' . $strip_url . '</a>';
+                                        $ret .= $in_block ? '</div>' : '</td>';
+                                    }
                                     $ret .= $in_block ? '</div>' : '</tr>';
                                 }
                             }

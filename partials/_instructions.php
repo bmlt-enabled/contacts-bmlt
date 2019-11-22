@@ -24,7 +24,7 @@
     <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- display_type</strong></h3>
     <div>
         <p><strong>display_type</strong></p>
-        <p>To change the display type add display_type="table" there are three different types <strong>simple</strong>, <strong>table</strong>, <strong>block</strong></p>
+        <p>To change the display type add display_type="table" there are two different types <strong>table</strong>, <strong>block</strong> the default is table</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; display_type=&quot;table&quot;]</p>
     </div>
     <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- parent_id</strong></h3>
@@ -35,7 +35,27 @@
     </div>
     <div>
         <p><strong>show_description</strong></p>
-        <p>This will display the service bodies description underneath the name if set..</p>
+        <p>This will display the service bodies description underneath the name if set.</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_description=&quot;1&quot;]</p>
+    </div>
+    <div>
+        <p><strong>show_email</strong></p>
+        <p>This will display the service bodies contact email underneath the name if set.</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_email=&quot;1&quot;]</p>
+    </div>
+    <div>
+        <p><strong>show_url_in_name</strong></p>
+        <p>This will add a link to the service body name, this is the default action. To remove the url from the service body name add show_url_in_name=&quot;0".</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_url_in_name=&quot;0"]</p>
+    </div>
+    <div>
+        <p><strong>show_tel_url</strong></p>
+        <p>This will add a tel link to the telephone number. Default is to not add it.</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_tel_url=&quot;1"]</p>
+    </div>
+    <div>
+        <p><strong>show_full_url</strong></p>
+        <p>This will add a separate column or div with the full url displayed. Default is to not add it.</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_full_url=&quot;1"]</p>
     </div>
 </div>
