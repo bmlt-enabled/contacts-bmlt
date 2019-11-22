@@ -387,6 +387,12 @@ if (!class_exists("contactsBmlt")) {
                                 // This is for convenience. We turn the serviceBody array into an associative one by adding the keys.
                                 $serviceBody = array_combine($keys, $serviceBody);
                                 $url = htmlspecialchars(trim(stripslashes($serviceBody['url'])));
+
+                                $scheme = parse_url($url, PHP_URL_SCHEME);
+                                if (empty($scheme)) {
+                                    $url = '//' . ltrim($url, '/');
+                                }
+
                                 $strip_url = rtrim(str_replace(array('http://','https://'), '', $url), '/');
                                 $helpline = htmlspecialchars(trim(stripslashes($serviceBody['helpline'])));
                                 $contact_email = htmlspecialchars(trim(stripslashes($serviceBody['contact_email'])));
