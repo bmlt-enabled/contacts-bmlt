@@ -16,9 +16,9 @@ Contacts BMLT is a plugin that displays helpline and website information about s
 
 SHORTCODE
 Basic: [contacts_bmlt]
-Attributes: root_server, display_type, parent_id
+Attributes: root_server, display_type, parent_id, show_description, show_email, show_url_in_name, show_tel_url, show_full_url
 
--- Shortcode parameters can be combined
+-- Most Shortcode parameters can be combined
 
 == Usage ==
 
