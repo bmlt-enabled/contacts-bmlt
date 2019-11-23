@@ -2,7 +2,7 @@
 /*
 Plugin Name: Contacts BMLT
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
-Author: bmlt-authors
+Author: bmlt-enabled
 Description: This plugin returns helpline and website info for service bodies Simply add [contacts_bmlt] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server.
 Version: 1.0.0
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
