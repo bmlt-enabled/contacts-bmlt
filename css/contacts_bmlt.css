@@ -40,15 +40,24 @@ div#contacts_bmlt_div div.bmlt_simple_contact_one_contact_div div
 
 div#contacts_bmlt_div div.bmlt_simple_contact_one_contact_service_body_name_div
 {
-	width:50%;
+	width:40%;
 }
 
-div#contacts_bmlt_div div.bmlt_simple_contact_one_helpline_town_div
+div#contacts_bmlt_div div.bmlt_simple_contact_one_contact_helpline_div
 {
-	width:20%;
-}
-
-div#contacts_bmlt_div div.bmlt_simple_contact_one_url_town_div
-{
+	float:left;
 	width:30%;
+}
+
+div#contacts_bmlt_div div.bmlt_simple_contact_one_contact_url_div
+{
+	float:left;
+	width:30%;
+}
+
+div#contacts_bmlt_div div.bmlt_simple_contact_one_contact_helpline_no_full_url_div
+{
+	text-align:center;
+	float:left;
+	width:60%;
 }

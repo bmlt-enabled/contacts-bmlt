@@ -94,7 +94,7 @@ if (!class_exists("contactsBmlt")) {
 
         public function enqueueFrontendFiles($hook)
         {
-            wp_enqueue_style('contacts-bmlt', plugin_dir_url(__FILE__) . 'css/contacts_bmlt.css', false, '1.15', 'all');
+            wp_enqueue_style('contacts-bmlt', plugin_dir_url(__FILE__) . 'css/contacts_bmlt.css', false, '1.20	', 'all');
         }
 
         public function testRootServer($root_server)
@@ -403,7 +403,7 @@ if (!class_exists("contactsBmlt")) {
                                     $phoneNumber = '<span class=\"bmlt_simple_list_helpline_text\">' . $helpline . '</span>';
                                 }
 
-                                if ($helpline || $url) {
+                                if ($helpline || $serviceBody['url']) {
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_div">' : '<tr class="bmlt_simple_contact_one_contact_tr">';
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_service_body_name_div">' : '<td class="bmlt_simple_contact_one_contact_service_body_name_td">';
@@ -420,11 +420,18 @@ if (!class_exists("contactsBmlt")) {
                                     }
                                     $ret .= $in_block ? '</div>' : '</td>';
 
-                                    $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_helpline_div">' : '<td class="bmlt_simple_contact_one_contact_helpline_td">';
-                                    $ret .= $phoneNumber;
-                                    $ret .= $in_block ? '</div>' : '</td>';
+
+                                    if ($show_full_url == "0") {
+                                        $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_helpline_no_full_url_div">' : '<td class="bmlt_simple_contact_one_contact_helpline_td">';
+                                        $ret .= $phoneNumber;
+                                        $ret .= $in_block ? '</div>' : '</td>';
+                                    }
 
                                     if ($show_full_url == "1") {
+                                        $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_helpline_div">' : '<td class="bmlt_simple_contact_one_contact_helpline_td">';
+                                        $ret .= $phoneNumber;
+                                        $ret .= $in_block ? '</div>' : '</td>';
+
                                         $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_url_div">' : '<td class="bmlt_simple_contact_one_contact_url_td">';
                                         $ret .= '<a href="' . $url . '">' . $strip_url . '</a>';
                                         $ret .= $in_block ? '</div>' : '</td>';
