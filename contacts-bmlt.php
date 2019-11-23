@@ -403,7 +403,7 @@ if (!class_exists("contactsBmlt")) {
                                     $phoneNumber = '<span class=\"bmlt_simple_list_helpline_text\">' . $helpline . '</span>';
                                 }
 
-                                if ($name) {
+                                if ($helpline || $url) {
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_div">' : '<tr class="bmlt_simple_contact_one_contact_tr">';
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_service_body_name_div">' : '<td class="bmlt_simple_contact_one_contact_service_body_name_td">';
