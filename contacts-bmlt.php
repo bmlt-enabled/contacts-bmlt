@@ -132,6 +132,10 @@ if (!class_exists("contactsBmlt")) {
                 'show_full_url'     => '0'
             ), $atts));
 
+            $services_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
+            $services_dropdown    = $services_data_dropdown[1];
+
+            $parent_id            = ($parent_id     != '' ? $parent_id     : $services_dropdown);
             $root_server          = ($root_server   != '' ? $root_server   : $this->options['root_server']);
             $display_type         = ($display_type  != '' ? $display_type  : $this->options['display_type_dropdown']);
 
@@ -191,6 +195,7 @@ if (!class_exists("contactsBmlt")) {
                     die('Whoops! There was a problem with the data you posted. Please go back and try again.');
                 }
                 $this->options['root_server']            = esc_url_raw($_POST['root_server']);
+                $this->options['service_body_dropdown']  = sanitize_text_field($_POST['service_body_dropdown']);
                 $this->options['display_type_dropdown']  = sanitize_text_field($_POST['display_type_dropdown']);
                 $this->options['custom_css_um']          = $_POST['custom_css_um'];
 
@@ -215,6 +220,34 @@ if (!class_exists("contactsBmlt")) {
                             <li>
                                 <label for="root_server">Default Root Server: </label>
                                 <input id="root_server" type="text" size="50" name="root_server" value="<?php echo $this->options['root_server']; ?>" /> <?php echo $connect; ?>
+                            </li>
+                        </ul>
+                    </div>
+                    <div style="padding: 0 15px;" class="postbox">
+                        <h3>Service Body Parent</h3>
+                        <p>This service body will be used as the parent, otherwise all service bodies from server will be used.</p>
+                        <ul>
+                            <li>
+                                <label for="service_body_dropdown">Default Service Body Parent: </label>
+                                <select style="display:inline;" id="service_body_dropdown" name="service_body_dropdown" class="contacts_bmlt_service_body_select">
+                                    <?php if ($this_connected) { ?>
+                                        <?php $unique_areas = $this->getParentServiceBodies($this->options['root_server']); ?>
+                                        <?php foreach ($unique_areas as $key => $unique_area) { ?>
+                                            <?php $area_data          = explode(',', $unique_area); ?>
+                                            <?php $area_name          = $area_data[0]; ?>
+                                            <?php $area_id            = $area_data[1]; ?>
+                                            <?php $option_description = $area_name . " (" . $area_id . ")" ?>
+                                            <?php $is_data = explode(',', esc_html($this->options['service_body_dropdown'])); ?>
+                                            <?php if ($area_id == $is_data[1]) { ?>
+                                                <option selected="selected" value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
+                                            <?php } else { ?>
+                                                <option value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
+                                            <?php } ?>
+                                        <?php } ?>
+                                    <?php } else { ?>
+                                        <option selected="selected" value="<?php echo $this->options['service_body_dropdown']; ?>"><?php echo 'Not Connected - Can not get Service Bodies'; ?></option>
+                                    <?php } ?>
+                                </select>
                             </li>
                         </ul>
                     </div>
@@ -259,7 +292,6 @@ if (!class_exists("contactsBmlt")) {
                 <br/><br/>
                 <?php include 'partials/_instructions.php'; ?>
             </div>
-            <script type="text/javascript">getContactsBmltValueSelected();</script>
             <?php
         }
 
@@ -288,6 +320,7 @@ if (!class_exists("contactsBmlt")) {
             if (!$theOptions = get_option($this->optionsName)) {
                 $theOptions = array(
                     "root_server"            => '',
+                    "service_body_dropdown"  => '',
                     'display_type_dropdown'  => 'simple'
                 );
                 update_option($this->optionsName, $theOptions);
@@ -317,7 +350,9 @@ if (!class_exists("contactsBmlt")) {
 
             $output = array();
 
-            if (isset($parent_id) && is_numeric($parent_id)) {
+            if (isset($parent_id) && $parent_id == "000") {
+                $output = $serviceBodies_results;
+            } elseif (isset($parent_id) && is_numeric($parent_id)) {
                 foreach ($serviceBodies_results as &$serviceBody) {
                     if ($serviceBody['parent_id'] == $parent_id || $serviceBody['id'] == $parent_id) {
                         $output[] = $serviceBody;
@@ -332,6 +367,42 @@ if (!class_exists("contactsBmlt")) {
             });
 
             return $output;
+        }
+
+        /**
+         * @param $root_server
+         * @return array
+         */
+        public function getParentServiceBodies($root_server)
+        {
+            $serviceBodiesURL =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetServiceBodies"));
+            $serviceBodies = json_decode($serviceBodiesURL, true);
+
+            $parent_body_ids = array();
+            $parent_bodies = array();
+
+            foreach ($serviceBodies as &$parentServiceBody) {
+                $parent_body_ids[] .= $parentServiceBody['parent_id'];
+            }
+
+            $unique_parent_body_ids = array_unique($parent_body_ids);
+
+            foreach ($serviceBodies as &$serviceBody) {
+                if (in_array($serviceBody['id'], $unique_parent_body_ids)) {
+                    $parent_bodies[] = $serviceBody;
+                }
+            }
+
+            usort($parent_bodies, function ($a, $b) {
+                return strnatcasecmp($a['name'], $b['name']);
+            });
+
+            $unique_service_bodies = array();
+            foreach ($parent_bodies as $value) {
+                $unique_service_bodies[] = $value['name'] . ',' . $value['id'];
+            }
+            array_unshift($unique_service_bodies , 'All Service Bodies,000');
+            return $unique_service_bodies;
         }
 
         /*******************************************************************/
