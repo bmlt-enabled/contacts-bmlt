@@ -357,7 +357,6 @@ if (!class_exists("contactsBmlt")) {
             $show_full_url = null     //
         ) {
             $ret = '';
-
             // What we do, is to parse the JSON return. We'll pick out certain fields, and format these into a table or block element return.
             if ($results) {
                 if (is_array($results) && count($results)) {
@@ -368,17 +367,10 @@ if (!class_exists("contactsBmlt")) {
                     }
                     $keys = array_keys($result_keys);
 
-                    $alt = 1;   // This is used to provide an alternating class.
                     for ($count = 0; $count < count($results); $count++) {
                         $serviceBody = $results[$count];
 
                         if ($serviceBody) {
-                            if ($alt == 1) {
-                                $alt = 0;
-                            } else {
-                                $alt = 1;
-                            }
-
                             if (is_array($serviceBody) && count($serviceBody)) {
                                 if (count($serviceBody) > count($keys)) {
                                     $keys[] = 'unused';
@@ -412,7 +404,7 @@ if (!class_exists("contactsBmlt")) {
                                 }
 
                                 if ($name) {
-                                    $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_div bmlt_alt_'.intval($alt).'">' : '<tr class="bmlt_simple_contact_one_contact_tr bmlt_alt_'.intval($alt).'">';
+                                    $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_div">' : '<tr class="bmlt_simple_contact_one_contact_tr">';
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_service_body_name_div">' : '<td class="bmlt_simple_contact_one_contact_service_body_name_td">';
                                     $ret .= $service_body_name;

@@ -13,43 +13,9 @@ select.contacts_bmlt_service_body_select {
 	font-family: "Open Sans",sans-serif !important;
 }
 
-div#contacts_bmlt_div span.c_comdef_search_results_province,
-div#contacts_bmlt_div span.c_comdef_search_results_nation,
-div#contacts_bmlt_div span.c_comdef_search_results_zip
+div#contacts_bmlt_div div.bmlt_simple_contacts_div div.bmlt_simple_contact_one_contact_div:nth-child(even)
 {
-	display:none;
-}
 
-div#contacts_bmlt_div table#bmlt_simple_meetings_table span.c_comdef_search_results_province,
-div#contacts_bmlt_div table#bmlt_simple_meetings_table span.c_comdef_search_results_nation,
-div#contacts_bmlt_div table#bmlt_simple_meetings_table span.c_comdef_search_results_zip
-{
-	display:none;
-}
-
-
-div#contacts_bmlt_div span.c_comdef_search_results_zip_separator
-{
-	display:none;
-}
-
-div#contacts_bmlt_div span.c_comdef_search_results_province_separator
-{
-	display:none;
-}
-
-div#contacts_bmlt_div span.c_comdef_search_results_nation_separator
-{
-	display:none;
-}
-
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_format_div
-{
-	text-align:right;
-}
-
-div#contacts_bmlt_div div.bmlt_simple_meetings_div div.bmlt_alt_0
-{
 	background-color:#efefef;
 }
 
@@ -59,55 +25,30 @@ div#contacts_bmlt_div div
 	font-size: medium;
 }
 
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_div
+div#contacts_bmlt_div div.bmlt_simple_contact_one_contact_div
 {
 	display:table;
 	width:100%;
 }
 
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_div div
+div#contacts_bmlt_div div.bmlt_simple_contact_one_contact_div div
 {
 	float:left;
 	padding:0.5em;
 	display:table;
 }
 
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_town_div
+div#contacts_bmlt_div div.bmlt_simple_contact_one_contact_service_body_name_div
 {
-	width:10%;
+	width:50%;
 }
 
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_town_div
-{
-	width:10%;
-}
-
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_town_div
-{
-	width:10%;
-}
-
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_name_div
+div#contacts_bmlt_div div.bmlt_simple_contact_one_helpline_town_div
 {
 	width:20%;
 }
 
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_time_div
-{
-	width:5%;
-}
-
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_weekday_div
-{
-	width:5%;
-}
-
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_address_div
+div#contacts_bmlt_div div.bmlt_simple_contact_one_url_town_div
 {
 	width:30%;
-}
-
-div#contacts_bmlt_div div.bmlt_simple_meeting_one_meeting_format_div
-{
-	width:10%;
 }
