@@ -393,7 +393,7 @@ if (!class_exists("contactsBmlt")) {
                                     $url = '//' . ltrim($url, '/');
                                 }
 
-                                $strip_url = rtrim(str_replace(array('http://','https://'), '', $url), '/');
+                                $strip_url = rtrim(str_replace(array('http://','https://','//'), '', $url), '/');
                                 $helpline = htmlspecialchars(trim(stripslashes($serviceBody['helpline'])));
                                 $contact_email = htmlspecialchars(trim(stripslashes($serviceBody['contact_email'])));
                                 $description = htmlspecialchars(trim(stripslashes($serviceBody['description'])));
