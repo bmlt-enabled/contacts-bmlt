@@ -462,7 +462,7 @@ if (!class_exists("contactsBmlt")) {
                                 $description = htmlspecialchars(trim(stripslashes($serviceBody['description'])));
                                 $name = htmlspecialchars(trim(stripslashes($serviceBody['name'])));
 
-                                if ($url && $show_url_in_name == "1") {
+                                if ($serviceBody['url'] && $show_url_in_name == "1") {
                                     $service_body_name = '<span class="bmlt_simple_list_service_body_name_text"><a href="' . $url . '">' . $name . '</a></span>';
                                 } else {
                                     $service_body_name = '<span class="bmlt_simple_list_service_body_name_text">' . $name . '</span>';
