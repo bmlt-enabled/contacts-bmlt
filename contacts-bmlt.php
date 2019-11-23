@@ -119,25 +119,30 @@ if (!class_exists("contactsBmlt")) {
             return $results;
         }
 
-        public function contactsBmltMain($atts, $content = null, $parent_id = null)
+        public function contactsBmltMain($atts, $content = null)
         {
             extract(shortcode_atts(array(
                 "root_server"       => '',
-                'display_type'      => 'table',
+                'display_type'      => '',
                 'parent_id'         => '',
-                'show_description'  => '0',
-                'show_url_in_name'  => '1',
-                'show_tel_url'      => '0',
-                'show_email'        => '0',
-                'show_full_url'     => '0'
+                'show_url_in_name'  => '',
+                'show_tel_url'      => '',
+                'show_full_url'     => '',
+                'show_description'  => '',
+                'show_email'        => ''
             ), $atts));
 
             $services_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
             $services_dropdown    = $services_data_dropdown[1];
 
-            $parent_id            = ($parent_id     != '' ? $parent_id     : $services_dropdown);
-            $root_server          = ($root_server   != '' ? $root_server   : $this->options['root_server']);
-            $display_type         = ($display_type  != '' ? $display_type  : $this->options['display_type_dropdown']);
+            $parent_id            = ($parent_id        != '' ? $parent_id        : $services_dropdown);
+            $root_server          = ($root_server      != '' ? $root_server      : $this->options['root_server']);
+            $display_type         = ($display_type     != '' ? $display_type     : $this->options['display_type_dropdown']);
+            $show_url_in_name     = ($show_url_in_name != '' ? $show_url_in_name : $this->options['show_url_in_name_checkbox']);
+            $show_tel_url         = ($show_tel_url     != '' ? $show_tel_url     : $this->options['show_tel_url_checkbox']);
+            $show_full_url        = ($show_full_url    != '' ? $show_full_url    : $this->options['show_full_url_checkbox']);
+            $show_description     = ($show_description != '' ? $show_description : $this->options['show_description_checkbox']);
+            $show_email           = ($show_email       != '' ? $show_email       : $this->options['show_email_checkbox']);
 
             if ($root_server == '') {
                 return '<p><strong>Contacts BMLT Error: Root Server missing. Please Verify you have entered a Root Server using the \'root_server\' shortcode attribute</strong></p>';
@@ -194,10 +199,15 @@ if (!class_exists("contactsBmlt")) {
                 if (!wp_verify_nonce($_POST['_wpnonce'], 'contactsbmltupdate-options')) {
                     die('Whoops! There was a problem with the data you posted. Please go back and try again.');
                 }
-                $this->options['root_server']            = esc_url_raw($_POST['root_server']);
-                $this->options['service_body_dropdown']  = sanitize_text_field($_POST['service_body_dropdown']);
-                $this->options['display_type_dropdown']  = sanitize_text_field($_POST['display_type_dropdown']);
-                $this->options['custom_css_um']          = $_POST['custom_css_um'];
+                $this->options['root_server']               = esc_url_raw($_POST['root_server']);
+                $this->options['service_body_dropdown']     = sanitize_text_field($_POST['service_body_dropdown']);
+                $this->options['display_type_dropdown']     = sanitize_text_field($_POST['display_type_dropdown']);
+                $this->options['show_url_in_name_checkbox'] = sanitize_text_field($_POST['show_url_in_name_checkbox']);
+                $this->options['show_tel_url_checkbox']     = sanitize_text_field($_POST['show_tel_url_checkbox']);
+                $this->options['show_full_url_checkbox']    = sanitize_text_field($_POST['show_full_url_checkbox']);
+                $this->options['show_description_checkbox'] = sanitize_text_field($_POST['show_description_checkbox']);
+                $this->options['show_email_checkbox']       = sanitize_text_field($_POST['show_email_checkbox']);
+                $this->options['custom_css_um']             = $_POST['custom_css_um'];
 
                 $this->saveAdminOptions();
                 echo '<div class="updated"><p>Success! Your changes were successfully saved!</p></div>';
@@ -268,13 +278,32 @@ if (!class_exists("contactsBmlt")) {
                                         <option value="block">HTML (bmlt block)</option>
                                         <?php
                                     } else { ?>
-                                        <option value="simple">Simple</option>
                                         <option value="table">HTML (bmlt table)</option>
                                         <option selected="selected" value="block">HTML (bmlt block)</option>
                                         <?php
                                     }
                                     ?>
                                 </select>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="show_url_in_name_checkbox" name="show_url_in_name_checkbox" value="1" <?php echo ($this->options['show_url_in_name_checkbox'] == "1" ? "checked" : "") ?>/>
+                                <label for="show_url_in_name_checkbox">Add URL link to service body name.</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="show_tel_url_checkbox" name="show_tel_url_checkbox" value="1" <?php echo ($this->options['show_tel_url_checkbox'] == "1" ? "checked" : "") ?>/>
+                                <label for="show_tel_url_checkbox">Add Tel link to phone number.</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="show_full_url_checkbox" name="show_full_url_checkbox" value="1" <?php echo ($this->options['show_full_url_checkbox'] == "1" ? "checked" : "") ?>/>
+                                <label for="show_full_url_checkbox">Show separate column displaying url.</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="show_description_checkbox" name="show_description_checkbox" value="1" <?php echo ($this->options['show_description_checkbox'] == "1" ? "checked" : "") ?>/>
+                                <label for="show_description_checkbox">Show Description</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="show_email_checkbox" name="show_email_checkbox" value="1" <?php echo ($this->options['show_email_checkbox'] == "1" ? "checked" : "") ?>/>
+                                <label for="show_email_checkbox">Show Email</label>
                             </li>
                         </ul>
                     </div>
@@ -319,9 +348,14 @@ if (!class_exists("contactsBmlt")) {
             // Don't forget to set up the default options
             if (!$theOptions = get_option($this->optionsName)) {
                 $theOptions = array(
-                    "root_server"            => '',
-                    "service_body_dropdown"  => '',
-                    'display_type_dropdown'  => 'simple'
+                    "root_server"                => '',
+                    "service_body_dropdown"      => '000',
+                    'display_type_dropdown'      => 'block',
+                    'show_url_in_name_checkbox'  => '1',
+                    'show_tel_url_checkbox'      => '0',
+                    'show_full_url_checkbox'     => '0',
+                    'show_description_checkbox'  => '0',
+                    'show_email_checkbox'        => '0'
                 );
                 update_option($this->optionsName, $theOptions);
             }
@@ -492,7 +526,7 @@ if (!class_exists("contactsBmlt")) {
                                     $ret .= $in_block ? '</div>' : '</td>';
 
 
-                                    if ($show_full_url == "0") {
+                                    if ($show_full_url != "1") {
                                         $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_helpline_no_full_url_div">' : '<td class="bmlt_simple_contact_one_contact_helpline_td">';
                                         $ret .= $phoneNumber;
                                         $ret .= $in_block ? '</div>' : '</td>';
