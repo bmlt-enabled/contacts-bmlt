@@ -435,7 +435,7 @@ if (!class_exists("contactsBmlt")) {
             foreach ($parent_bodies as $value) {
                 $unique_service_bodies[] = $value['name'] . ',' . $value['id'];
             }
-            array_unshift($unique_service_bodies , 'All Service Bodies,000');
+            array_unshift($unique_service_bodies, 'All Service Bodies,000');
             return $unique_service_bodies;
         }
 
