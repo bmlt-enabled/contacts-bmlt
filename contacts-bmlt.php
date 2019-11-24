@@ -291,11 +291,11 @@ if (!class_exists("contactsBmlt")) {
                             </li>
                             <li>
                                 <input type="checkbox" id="show_tel_url_checkbox" name="show_tel_url_checkbox" value="1" <?php echo ($this->options['show_tel_url_checkbox'] == "1" ? "checked" : "") ?>/>
-                                <label for="show_tel_url_checkbox">Add Tel link to phone number.</label>
+                                <label for="show_tel_url_checkbox">Add tel link to phone number.</label>
                             </li>
                             <li>
                                 <input type="checkbox" id="show_full_url_checkbox" name="show_full_url_checkbox" value="1" <?php echo ($this->options['show_full_url_checkbox'] == "1" ? "checked" : "") ?>/>
-                                <label for="show_full_url_checkbox">Show separate column displaying url.</label>
+                                <label for="show_full_url_checkbox">Show separate column displaying URL.</label>
                             </li>
                             <li>
                                 <input type="checkbox" id="show_description_checkbox" name="show_description_checkbox" value="1" <?php echo ($this->options['show_description_checkbox'] == "1" ? "checked" : "") ?>/>
@@ -303,7 +303,7 @@ if (!class_exists("contactsBmlt")) {
                             </li>
                             <li>
                                 <input type="checkbox" id="show_email_checkbox" name="show_email_checkbox" value="1" <?php echo ($this->options['show_email_checkbox'] == "1" ? "checked" : "") ?>/>
-                                <label for="show_email_checkbox">Show Email</label>
+                                <label for="show_email_checkbox">Show Email (note will only work if server is setup to display email)</label>
                             </li>
                         </ul>
                     </div>
