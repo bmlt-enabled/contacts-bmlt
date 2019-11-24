@@ -149,10 +149,6 @@ if (!class_exists("contactsBmlt")) {
             }
 
             $output = '';
-            $css_um = $this->options['custom_css_um'];
-
-            $output .= "<style type='text/css'>$css_um</style>";
-
             $service_body_results = $this->getServiceBodiesJson($root_server, $parent_id);
 
             if ($display_type != '' && $display_type == 'table') {
@@ -207,7 +203,6 @@ if (!class_exists("contactsBmlt")) {
                 $this->options['show_full_url_checkbox']    = sanitize_text_field($_POST['show_full_url_checkbox']);
                 $this->options['show_description_checkbox'] = sanitize_text_field($_POST['show_description_checkbox']);
                 $this->options['show_email_checkbox']       = sanitize_text_field($_POST['show_email_checkbox']);
-                $this->options['custom_css_um']             = $_POST['custom_css_um'];
 
                 $this->saveAdminOptions();
                 echo '<div class="updated"><p>Success! Your changes were successfully saved!</p></div>';
@@ -304,15 +299,6 @@ if (!class_exists("contactsBmlt")) {
                             <li>
                                 <input type="checkbox" id="show_email_checkbox" name="show_email_checkbox" value="1" <?php echo ($this->options['show_email_checkbox'] == "1" ? "checked" : "") ?>/>
                                 <label for="show_email_checkbox">Show Email (note will only work if server is setup to display email)</label>
-                            </li>
-                        </ul>
-                    </div>
-                    <div style="padding: 0 15px;" class="postbox">
-                        <h3>Custom CSS</h3>
-                        <p>Allows for custom styling of Contacts BMLT.</p>
-                        <ul>
-                            <li>
-                                <textarea id="custom_css_um" name="custom_css_um" cols="100" rows="10"><?php echo $this->options['custom_css_um']; ?></textarea>
                             </li>
                         </ul>
                     </div>
