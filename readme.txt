@@ -1,6 +1,6 @@
 === Contacts BMLT ===
 
-Contributors: pjaudiomv
+Contributors: pjaudiomv, bmltenabled
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
 Tags: bmlt, basic meeting list toolbox, Contacts, narcotics anonymous, na
 Requires at least: 4.0
