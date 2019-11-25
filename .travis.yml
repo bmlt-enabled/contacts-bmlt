@@ -64,11 +64,10 @@ jobs:
       on:
         tags: true
         condition: $TRAVIS_TAG != *beta*
-    #- provider: script
-    #  script: ./deploy-wordpress.sh
-    #  condition: $TRAVIS_TAG != *beta*
-    #  on:
-    #    tags: true
+    - provider: script
+      script: ./deploy-wordpress.sh
+      on:
+        tags: true
 notifications:
   slack:
     rooms:
