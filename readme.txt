@@ -6,7 +6,7 @@ Tags: bmlt, basic meeting list toolbox, Contacts, narcotics anonymous, na
 Requires at least: 4.0
 Requires PHP: 5.6
 Tested up to: 5.3
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Contacts BMLT is a plugin that displays helpline and website information about s
 
 SHORTCODE
 Basic: [contacts_bmlt]
-Attributes: root_server, display_type, parent_id, show_description, show_email, show_url_in_name, show_tel_url, show_full_url
+Attributes: root_server, display_type, parent_id, show_description, show_email, show_url_in_name, show_tel_url, show_full_url, show_all_services, show_locations
 
 -- Most Shortcode parameters can be combined
 
@@ -45,7 +45,13 @@ Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; sh
 Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_tel_url=&quot;1&quot;]
 
 **show_full_url** This will add a separate column or div with the full url displayed. Default is to not add it.
-Ex. Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_full_url=&quot;1&quot;]
+Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_full_url=&quot;1&quot;]
+
+**show_all_services** This will display all service bodies regardless of whether they have their phone or URL field filled out. The default is not to display them.
+Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_all_services=&quot;1&quot;]
+
+**show_locations** This will display a list of locations below the service body name. Accepted values are location_neighborhood, location_city_subsection, location_municipality, location_sub_province.
+Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_locations=&quot;location_municipality&quot;]
 
 
 == EXAMPLES ==
@@ -72,6 +78,12 @@ This section describes how to install the plugin and get it working.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.1.0 =
+
+* Added option to show all service bodies regardless of if they have any contact info.
+* Simplified some code with checking the service bodies.
+* Added ability to show service body locations under service body name.
 
 = 1.0.0 =
 

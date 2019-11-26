@@ -4,7 +4,7 @@
     <h3 class="help-accordian"><strong>Basic</strong></h3>
     <div>
         <p>[contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot;]</p>
-        <strong>Attributes:</strong> root_server, display_type, parent_id, show_description, show_email, show_url_in_name, show_tel_url, show_full_url
+        <strong>Attributes:</strong> root_server, display_type, parent_id, show_description, show_email, show_url_in_name, show_tel_url, show_full_url, show_all_services, show_locations
         <p><strong>Most Shortcode parameters can be combined.</strong></p>
     </div>
     <h3 class="help-accordian"><strong>Shortcode Attributes</strong></h3>
@@ -18,6 +18,8 @@
         <p><strong>show_url_in_name</strong></p>
         <p><strong>show_tel_url</strong></p>
         <p><strong>show_full_url</strong></p>
+        <p><strong>show_all_services</strong></p>
+        <p><strong>show_locations</strong></p>
         <p>A minimum of root_server attribute is required.</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot;]</p>
     </div>
@@ -68,5 +70,17 @@
         <p><strong>show_full_url</strong></p>
         <p>This will add a separate column or div with the full url displayed. Default is to not add it.</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_full_url=&quot;1"]</p>
+    </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;- show_all_services</strong></h3>
+    <div>
+        <p><strong>show_all_services</strong></p>
+        <p>This will display all service bodies regardless of whether they have their phone or URL field filled out. The default is not to display them.</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_all_services=&quot;1"]</p>
+    </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;- show_locations</strong></h3>
+    <div>
+        <p><strong>show_locations</strong></p>
+        <p>This will display a list of locations below the service body name. Accepted values are location_neighborhood, location_city_subsection, location_municipality, location_sub_province.</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_locations=&quot;location_municipality"]</p>
     </div>
 </div>

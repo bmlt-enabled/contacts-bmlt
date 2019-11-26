@@ -4,7 +4,7 @@ Plugin Name: Contacts BMLT
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
 Author: bmlt-enabled
 Description: This plugin returns helpline and website info for service bodies Simply add [contacts_bmlt] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server.
-Version: 1.0.0
+Version: 1.1.0
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -129,37 +129,41 @@ if (!class_exists("contactsBmlt")) {
                 'show_tel_url'      => '',
                 'show_full_url'     => '',
                 'show_description'  => '',
-                'show_email'        => ''
+                'show_email'        => '',
+                'show_all_services' => '',
+                'show_locations'    => ''
             ), $atts));
 
             $services_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
             $services_dropdown    = $services_data_dropdown[1];
 
-            $parent_id            = ($parent_id        != '' ? $parent_id        : $services_dropdown);
-            $root_server          = ($root_server      != '' ? $root_server      : $this->options['root_server']);
-            $display_type         = ($display_type     != '' ? $display_type     : $this->options['display_type_dropdown']);
-            $show_url_in_name     = ($show_url_in_name != '' ? $show_url_in_name : $this->options['show_url_in_name_checkbox']);
-            $show_tel_url         = ($show_tel_url     != '' ? $show_tel_url     : $this->options['show_tel_url_checkbox']);
-            $show_full_url        = ($show_full_url    != '' ? $show_full_url    : $this->options['show_full_url_checkbox']);
-            $show_description     = ($show_description != '' ? $show_description : $this->options['show_description_checkbox']);
-            $show_email           = ($show_email       != '' ? $show_email       : $this->options['show_email_checkbox']);
+            $parent_id            = ($parent_id         != '' ? $parent_id         : $services_dropdown);
+            $root_server          = ($root_server       != '' ? $root_server       : $this->options['root_server']);
+            $display_type         = ($display_type      != '' ? $display_type      : $this->options['display_type_dropdown']);
+            $show_url_in_name     = ($show_url_in_name  != '' ? $show_url_in_name  : $this->options['show_url_in_name_checkbox']);
+            $show_tel_url         = ($show_tel_url      != '' ? $show_tel_url      : $this->options['show_tel_url_checkbox']);
+            $show_full_url        = ($show_full_url     != '' ? $show_full_url     : $this->options['show_full_url_checkbox']);
+            $show_description     = ($show_description  != '' ? $show_description  : $this->options['show_description_checkbox']);
+            $show_email           = ($show_email        != '' ? $show_email        : $this->options['show_email_checkbox']);
+            $show_all_services    = ($show_all_services != '' ? $show_all_services : $this->options['show_all_services_checkbox']);
+            $show_locations       = ($show_locations    != '' ? $show_locations    : $this->options['show_locations_dropdown']);
 
             if ($root_server == '') {
                 return '<p><strong>Contacts BMLT Error: Root Server missing. Please Verify you have entered a Root Server using the \'root_server\' shortcode attribute</strong></p>';
             }
 
             $output = '';
-            $service_body_results = $this->getServiceBodiesJson($root_server, $parent_id);
+            $service_body_results = $this->getServiceBodiesJson($root_server, $parent_id, $show_all_services);
 
             if ($display_type != '' && $display_type == 'table') {
                 $output .= '<div id="contacts_bmlt_div">';
-                $output .= $this->serviceBodiesJson2Html($service_body_results, false, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url);
+                $output .= $this->serviceBodiesJson2Html($service_body_results, false, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url, $show_locations, $root_server);
                 $output .= '</div>';
             }
 
             if ($display_type != '' && $display_type == 'block') {
                 $output .= '<div id="contacts_bmlt_div">';
-                $output .= $this->serviceBodiesJson2Html($service_body_results, true, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url);
+                $output .= $this->serviceBodiesJson2Html($service_body_results, true, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url, $show_locations, $root_server);
                 $output .= '</div>';
             }
 
@@ -195,14 +199,16 @@ if (!class_exists("contactsBmlt")) {
                 if (!wp_verify_nonce($_POST['_wpnonce'], 'contactsbmltupdate-options')) {
                     die('Whoops! There was a problem with the data you posted. Please go back and try again.');
                 }
-                $this->options['root_server']               = esc_url_raw($_POST['root_server']);
-                $this->options['service_body_dropdown']     = sanitize_text_field($_POST['service_body_dropdown']);
-                $this->options['display_type_dropdown']     = sanitize_text_field($_POST['display_type_dropdown']);
-                $this->options['show_url_in_name_checkbox'] = sanitize_text_field($_POST['show_url_in_name_checkbox']);
-                $this->options['show_tel_url_checkbox']     = sanitize_text_field($_POST['show_tel_url_checkbox']);
-                $this->options['show_full_url_checkbox']    = sanitize_text_field($_POST['show_full_url_checkbox']);
-                $this->options['show_description_checkbox'] = sanitize_text_field($_POST['show_description_checkbox']);
-                $this->options['show_email_checkbox']       = sanitize_text_field($_POST['show_email_checkbox']);
+                $this->options['root_server']                = esc_url_raw($_POST['root_server']);
+                $this->options['service_body_dropdown']      = sanitize_text_field($_POST['service_body_dropdown']);
+                $this->options['display_type_dropdown']      = sanitize_text_field($_POST['display_type_dropdown']);
+                $this->options['show_url_in_name_checkbox']  = sanitize_text_field($_POST['show_url_in_name_checkbox']);
+                $this->options['show_tel_url_checkbox']      = sanitize_text_field($_POST['show_tel_url_checkbox']);
+                $this->options['show_full_url_checkbox']     = sanitize_text_field($_POST['show_full_url_checkbox']);
+                $this->options['show_description_checkbox']  = sanitize_text_field($_POST['show_description_checkbox']);
+                $this->options['show_email_checkbox']        = sanitize_text_field($_POST['show_email_checkbox']);
+                $this->options['show_all_services_checkbox'] = sanitize_text_field($_POST['show_all_services_checkbox']);
+                $this->options['show_locations_dropdown']    = sanitize_text_field($_POST['show_locations_dropdown']);
 
                 $this->saveAdminOptions();
                 echo '<div class="updated"><p>Success! Your changes were successfully saved!</p></div>';
@@ -262,13 +268,7 @@ if (!class_exists("contactsBmlt")) {
                             <li>
                                 <label for="display_type_dropdown">Display Type: </label>
                                 <select style="display:inline;" id="display_type_dropdown" name="display_type_dropdown"  class="display_type_select">
-                                    <?php if ($this->options['display_type_dropdown'] == 'simple') { ?>
-                                        <option selected="selected" value="simple">Simple</option>
-                                        <option value="table">HTML (bmlt table)</option>
-                                        <option value="block">HTML (bmlt block)</option>
-                                        <?php
-                                    } else if ($this->options['display_type_dropdown'] == 'table') { ?>
-                                        <option value="simple">Simple</option>
+                                    <?php if ($this->options['display_type_dropdown'] == 'table') { ?>
                                         <option selected="selected" value="table">HTML (bmlt table)</option>
                                         <option value="block">HTML (bmlt block)</option>
                                         <?php
@@ -299,6 +299,54 @@ if (!class_exists("contactsBmlt")) {
                             <li>
                                 <input type="checkbox" id="show_email_checkbox" name="show_email_checkbox" value="1" <?php echo ($this->options['show_email_checkbox'] == "1" ? "checked" : "") ?>/>
                                 <label for="show_email_checkbox">Show Email (note will only work if server is setup to display email)</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="show_all_services_checkbox" name="show_all_services_checkbox" value="1" <?php echo ($this->options['show_all_services_checkbox'] == "1" ? "checked" : "") ?>/>
+                                <label for="show_all_services_checkbox">Show All Services (This will display all service bodies regardless of whether they have their phone or URL field filled out)</label>
+                            </li>
+                            <li>
+                                <label for="show_locations_dropdown">Show Locations: </label>
+                                <select style="display:inline;" id="show_locations_dropdown" name="show_locations_dropdown"  class="show_locations_select">
+                                    <?php if ($this->options['show_locations_dropdown'] == 'location_municipality') { ?>
+                                        <option selected="selected" value="location_municipality">City</option>
+                                        <option value="location_city_subsection">City Subsection</option>
+                                        <option value="location_sub_province">County</option>
+                                        <option value="location_neighborhood">Neighborhood</option>
+                                        <option value="0">NONE</option>
+                                        <?php
+                                    } elseif ($this->options['show_locations_dropdown'] == 'location_city_subsection') { ?>
+                                        <option value="location_municipality">City</option>
+                                        <option selected="selected" value="location_city_subsection">City Subsection</option>
+                                        <option value="location_sub_province">County</option>
+                                        <option value="location_neighborhood">Neighborhood</option>
+                                        <option value="0">NONE</option>
+                                        <?php
+                                    } elseif ($this->options['show_locations_dropdown'] == 'location_sub_province') { ?>
+                                        <option value="location_municipality">City</option>
+                                        <option value="location_city_subsection">City Subsection</option>
+                                        <option selected="selected" value="location_sub_province">County</option>
+                                        <option value="location_neighborhood">Neighborhood</option>
+                                        <option value="0">NONE</option>
+                                        <?php
+                                    }  elseif ($this->options['show_locations_dropdown'] == 'location_neighborhood') { ?>
+                                        <option value="location_municipality">City</option>
+                                        <option value="location_city_subsection">City Subsection</option>
+                                        <option value="location_sub_province">County</option>
+                                        <option selected="selected" value="location_neighborhood">Neighborhood</option>
+                                        <option value="0">NONE</option>
+                                        <?php
+                                    } else { ?>
+                                        <option value="location_municipality">City</option>
+                                        <option value="location_city_subsection">City Subsection</option>
+                                        <option value="location_sub_province">County</option>
+                                        <option value="location_neighborhood">Neighborhood</option>
+                                        <option selected="selected" value="0">NONE</option>
+                                        <?php
+                                    }
+                                    ?>
+                                    ?>
+                                </select>
+                                <label for="show_locations_dropdown"> (This will display a list of locations below the service body name)</label>
                             </li>
                         </ul>
                     </div>
@@ -341,7 +389,9 @@ if (!class_exists("contactsBmlt")) {
                     'show_tel_url_checkbox'      => '0',
                     'show_full_url_checkbox'     => '0',
                     'show_description_checkbox'  => '0',
-                    'show_email_checkbox'        => '0'
+                    'show_email_checkbox'        => '0',
+                    'show_all_services_checkbox' => '0',
+                    'show_locations_dropdown'    => '0'
                 );
                 update_option($this->optionsName, $theOptions);
             }
@@ -361,21 +411,35 @@ if (!class_exists("contactsBmlt")) {
         /**
          * @param $root_server
          * @param null $parent_id
+         * @param null $show_all_services
          * @return array
          */
-        public function getServiceBodiesJson($root_server, $parent_id = null)
+        public function getServiceBodiesJson($root_server, $parent_id = null, $show_all_services = null)
         {
             $serviceBodiesURL =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetServiceBodies"));
             $serviceBodies_results = json_decode($serviceBodiesURL, true);
 
             $output = array();
 
+
             if (isset($parent_id) && $parent_id == "000") {
-                $output = $serviceBodies_results;
+                if ($show_all_services == "1") {
+                    $output = $serviceBodies_results;
+                } elseif ($show_all_services != "1") {
+                    foreach ($serviceBodies_results as &$serviceBody) {
+                        if ($serviceBody['helpline'] || $serviceBody['url']) {
+                            $output[] = $serviceBody;
+                        }
+                    }
+                }
             } elseif (isset($parent_id) && is_numeric($parent_id)) {
                 foreach ($serviceBodies_results as &$serviceBody) {
                     if ($serviceBody['parent_id'] == $parent_id || $serviceBody['id'] == $parent_id) {
-                        $output[] = $serviceBody;
+                        if ($show_all_services == "1") {
+                            $output[] = $serviceBody;
+                        } elseif ($show_all_services != "1" && $serviceBody['helpline'] || $serviceBody['url']) {
+                            $output[] = $serviceBody;
+                        }
                     }
                 }
             } else {
@@ -436,39 +500,30 @@ if (!class_exists("contactsBmlt")) {
          * @param null $show_tel_url
          * @param null $show_email
          * @param null $show_full_url
+         * @param null $show_locations
+         * @param null $root_server
          * @return string
          */
         public function serviceBodiesJson2Html(
-            $results,                 ///< The results.
-            $in_block = false,        ///< If this is true, the results will be sent back as block elements (div tags), as opposed to a table. Default is false.
-            $show_description = null, //
-            $show_url_in_name = null, //
-            $show_tel_url = null,     //
-            $show_email = null,       //
-            $show_full_url = null     //
+            $results,                   ///< The results.
+            $in_block = false,          ///< If this is true, the results will be sent back as block elements (div tags), as opposed to a table. Default is false.
+            $show_description = null,   //
+            $show_url_in_name = null,   //
+            $show_tel_url = null,       //
+            $show_email = null,         //
+            $show_full_url = null,      //
+            $show_locations = null,     //
+            $root_server = null         //
         ) {
             $ret = '';
             // What we do, is to parse the JSON return. We'll pick out certain fields, and format these into a table or block element return.
             if ($results) {
                 if (is_array($results) && count($results)) {
                     $ret = $in_block ? '<div class="bmlt_simple_contacts_div">' : '<table class="bmlt_simple_contacts_table" cellpadding="0" cellspacing="0" summary="Contacts">';
-                    $result_keys = array();
-                    foreach ($results as $sub) {
-                        $result_keys = array_merge($result_keys, $sub);
-                    }
-                    $keys = array_keys($result_keys);
 
-                    for ($count = 0; $count < count($results); $count++) {
-                        $serviceBody = $results[$count];
-
+                    foreach ($results as $serviceBody) {
                         if ($serviceBody) {
                             if (is_array($serviceBody) && count($serviceBody)) {
-                                if (count($serviceBody) > count($keys)) {
-                                    $keys[] = 'unused';
-                                }
-
-                                // This is for convenience. We turn the serviceBody array into an associative one by adding the keys.
-                                $serviceBody = array_combine($keys, $serviceBody);
                                 $url = htmlspecialchars(trim(stripslashes($serviceBody['url'])));
 
                                 $scheme = parse_url($url, PHP_URL_SCHEME);
@@ -488,20 +543,34 @@ if (!class_exists("contactsBmlt")) {
                                     $service_body_name = '<span class="bmlt_simple_list_service_body_name_text">' . $name . '</span>';
                                 }
 
-                                if ($helpline && $show_tel_url =="1") {
+                                if ($helpline && $show_tel_url == "1") {
                                     $phoneNumber = '<span class=\"bmlt_simple_list_helpline_text\"><a href="tel:' . $helpline . '">' . $helpline . '</a></span>';
                                 } else {
                                     $phoneNumber = '<span class=\"bmlt_simple_list_helpline_text\">' . $helpline . '</span>';
                                 }
 
-                                if ($helpline || $serviceBody['url']) {
+                                $location_values = array("location_neighborhood", "location_city_subsection", "location_municipality", "location_sub_province");
+                                if ($show_locations) {
+                                    if (in_array($show_locations, $location_values)) {
+                                        $locations_list = '<span class="bmlt_simple_list_locations_list_text">' . $this->getLocationsList($root_server, $serviceBody['id'], $show_locations). '</span>';
+                                    } else {
+                                        $locations_list = '<span class="bmlt_simple_list_locations_list_text">' . $this->getLocationsList($root_server, $serviceBody['id'], 'location_municipality'). '</span>';
+                                    }
+                                }
+
+                                if ($name) {
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_div">' : '<tr class="bmlt_simple_contact_one_contact_tr">';
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_service_body_name_div">' : '<td class="bmlt_simple_contact_one_contact_service_body_name_td">';
                                     $ret .= $service_body_name;
                                     if ($contact_email && $show_email == "1") {
-                                        $ret .= '<div class="bmlt_simple_contact_one_contact_service_body_contact_email_div">';
+                                        $ret .= '<div class="bmlt_simple_contact_one_contact_list_locations_div">';
                                         $ret .= $contact_email;
+                                        $ret .= '</div>';
+                                    }
+                                    if ($show_locations) {
+                                        $ret .= '<div class="bmlt_simple_contact_one_contact_show_locations_div">';
+                                        $ret .= $locations_list;
                                         $ret .= '</div>';
                                     }
                                     if ($description && $show_description == "1") {
@@ -537,6 +606,44 @@ if (!class_exists("contactsBmlt")) {
             }
 
             return $ret;
+        }
+
+        /*******************************************************************/
+        /**
+         * \brief  This returns the search results, in whatever form was requested.
+         * \returns XHTML data. It will either be a table, or block elements.
+         * @param $root_server
+         * @param $services
+         * @param $data_field_key
+         * @return string
+         */
+        public function getLocationsList($root_server, $services, $data_field_key)
+        {
+            $serviceBodies = explode(',', $services);
+            $services_query = '';
+            foreach ($serviceBodies as $serviceBody) {
+                $services_query .= '&services[]=' .$serviceBody;
+            }
+            $listUrl = file_get_contents($root_server . "/client_interface/json/?switcher=GetSearchResults"
+                . $services_query
+                . "&data_field_key="
+                . $data_field_key);
+            $listResults = json_decode($listUrl, true);
+            $unique_locations = array();
+            foreach ($listResults as $value) {
+                if ($value[$data_field_key] != '') {
+                    $unique_locations[] .= str_replace('.', '', strtolower($value[$data_field_key]));
+                }
+            }
+            $unique_locations = array_unique($unique_locations);
+            asort($unique_locations);
+            $unique_locations_string = "";
+
+            foreach ($unique_locations as $unique_location) {
+                $unique_locations_string .= trim(ucfirst($unique_location)) . ", ";
+            }
+            $unique_locations_string = rtrim(trim($unique_locations_string) , ',');
+            return $unique_locations_string;
         }
     }
     //End Class ContactsBmlt
