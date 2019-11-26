@@ -6,7 +6,7 @@ Tags: bmlt, basic meeting list toolbox, Contacts, narcotics anonymous, na
 Requires at least: 4.0
 Requires PHP: 5.6
 Tested up to: 5.3
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,10 @@ This section describes how to install the plugin and get it working.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.1.1 =
+
+* Fix casing for location info.
 
 = 1.1.0 =
 
