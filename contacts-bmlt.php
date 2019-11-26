@@ -328,7 +328,7 @@ if (!class_exists("contactsBmlt")) {
                                         <option value="location_neighborhood">Neighborhood</option>
                                         <option value="0">NONE</option>
                                         <?php
-                                    }  elseif ($this->options['show_locations_dropdown'] == 'location_neighborhood') { ?>
+                                    } elseif ($this->options['show_locations_dropdown'] == 'location_neighborhood') { ?>
                                         <option value="location_municipality">City</option>
                                         <option value="location_city_subsection">City Subsection</option>
                                         <option value="location_sub_province">County</option>
@@ -642,7 +642,7 @@ if (!class_exists("contactsBmlt")) {
             foreach ($unique_locations as $unique_location) {
                 $unique_locations_string .= trim(ucfirst($unique_location)) . ", ";
             }
-            $unique_locations_string = rtrim(trim($unique_locations_string) , ',');
+            $unique_locations_string = rtrim(trim($unique_locations_string), ',');
             return $unique_locations_string;
         }
     }
