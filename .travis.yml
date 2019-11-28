@@ -68,7 +68,8 @@ jobs:
         tags: true
         condition: $TRAVIS_TAG != *beta*
     - provider: script
-      script: bash ./deploy-wordpress.sh
+      skip_cleanup: true
+      script: ./deploy-wordpress.sh
       on:
         tags: true
 notifications:
