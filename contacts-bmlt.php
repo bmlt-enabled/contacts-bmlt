@@ -4,7 +4,7 @@ Plugin Name: Contacts BMLT
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
 Author: bmlt-enabled
 Description: This plugin returns helpline and website info for service bodies Simply add [contacts_bmlt] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server.
-Version: 1.1.1
+Version: 1.1.2
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -544,9 +544,9 @@ if (!class_exists("contactsBmlt")) {
                                 }
 
                                 if ($helpline && $show_tel_url == "1") {
-                                    $phoneNumber = '<span class=\"bmlt_simple_list_helpline_text\"><a href="tel:' . $helpline . '">' . $helpline . '</a></span>';
+                                    $phoneNumber = '<span class="bmlt_simple_list_helpline_text"><a href="tel:' . $helpline . '">' . $helpline . '</a></span>';
                                 } else {
-                                    $phoneNumber = '<span class=\"bmlt_simple_list_helpline_text\">' . $helpline . '</span>';
+                                    $phoneNumber = '<span class="bmlt_simple_list_helpline_text">' . $helpline . '</span>';
                                 }
 
                                 $location_values = array("location_neighborhood", "location_city_subsection", "location_municipality", "location_sub_province");
