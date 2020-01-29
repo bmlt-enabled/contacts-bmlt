@@ -65,6 +65,7 @@ jobs:
         tags: true
         condition: $TRAVIS_TAG != *beta*
     - provider: script
+      edge: true
       script: ./deploy-wordpress.sh
       on:
         tags: true
