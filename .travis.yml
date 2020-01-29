@@ -36,7 +36,6 @@ jobs:
     - chmod +x deploy-wordpress.sh
     deploy:
     - provider: s3
-      skip_cleanup: true
       edge: true
       access_key_id: AKIAI7JHYFA6DI3WYP5A
       secret_access_key:
@@ -47,7 +46,6 @@ jobs:
       on:
         all_branches: true
     - provider: releases
-      skip_cleanup: true
       edge: true
       token:
         secure: YTYjNNSVlw5LV8J3RXKQPRX3HuzXOsdrJf+ScD7Q0SZvbFbIuqerKZn/5AFfKHvfhryQ6a5PUbO6qnbvie3TA+oXltoRxsZ80sDDvrbqmhWVfyd5cLJ/yLUNNrKLj2/j7LZX6ZmgohCdxFo+51mOyy9PFR7kzJ2hwWvFZvi0r3rvE/r8WKqoTax3GcoEmxCZn77N+klhonYajrqktbJk8mkhuufPEyNs6aX9VvbVDy+faTYzFjIXN1+PxDtXCdj2SZ4hWo9BEM904WaVMhO6glZCeerXzYGuYXmkgLDXMFDiJMDuim9xWUVAjXWhie+tMfM8OO9JvbKfIJZUC+q+vX4q3AuEr7eQj0RfuN56TVZ0JOLIFCKl6cx8rwXyDzPG8lC+tLHRNigwuvpTs6R1XdQkJ8RHGRn0TdCSwCKW3FVHo+4KID+J5xioy2zaV2iAcACUYJNq1Bau/0yYFRJWkIEWj8dmCHDh5F4FZF3Mr+mJDFW8haKL/bgxwiQhc2a0YLN71G7Dfi1SBIxXhdWGqrKqdKxGylQhk9XC5CQcBPOi/HwFfULfKetRxnh3l7ngPJRbX8CEKAylXxn5fPNiRysbS5BoFiQevv5mFyh2c95FX8eHXUMHtQHmKoa9f8mZU5bHHQ1x5GO9T8z4mCkyItA2CIe2jVl8/Hd41TbZEBE=
@@ -58,7 +56,6 @@ jobs:
         tags: true
         condition: $TRAVIS_TAG =~ "beta"
     - provider: releases
-      skip_cleanup: true
       edge: true
       token:
         secure: YTYjNNSVlw5LV8J3RXKQPRX3HuzXOsdrJf+ScD7Q0SZvbFbIuqerKZn/5AFfKHvfhryQ6a5PUbO6qnbvie3TA+oXltoRxsZ80sDDvrbqmhWVfyd5cLJ/yLUNNrKLj2/j7LZX6ZmgohCdxFo+51mOyy9PFR7kzJ2hwWvFZvi0r3rvE/r8WKqoTax3GcoEmxCZn77N+klhonYajrqktbJk8mkhuufPEyNs6aX9VvbVDy+faTYzFjIXN1+PxDtXCdj2SZ4hWo9BEM904WaVMhO6glZCeerXzYGuYXmkgLDXMFDiJMDuim9xWUVAjXWhie+tMfM8OO9JvbKfIJZUC+q+vX4q3AuEr7eQj0RfuN56TVZ0JOLIFCKl6cx8rwXyDzPG8lC+tLHRNigwuvpTs6R1XdQkJ8RHGRn0TdCSwCKW3FVHo+4KID+J5xioy2zaV2iAcACUYJNq1Bau/0yYFRJWkIEWj8dmCHDh5F4FZF3Mr+mJDFW8haKL/bgxwiQhc2a0YLN71G7Dfi1SBIxXhdWGqrKqdKxGylQhk9XC5CQcBPOi/HwFfULfKetRxnh3l7ngPJRbX8CEKAylXxn5fPNiRysbS5BoFiQevv5mFyh2c95FX8eHXUMHtQHmKoa9f8mZU5bHHQ1x5GO9T8z4mCkyItA2CIe2jVl8/Hd41TbZEBE=
@@ -68,7 +65,6 @@ jobs:
         tags: true
         condition: $TRAVIS_TAG != *beta*
     - provider: script
-      skip_cleanup: true
       script: ./deploy-wordpress.sh
       on:
         tags: true
