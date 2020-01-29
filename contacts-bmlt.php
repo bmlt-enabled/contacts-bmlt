@@ -2,9 +2,9 @@
 /*
 Plugin Name: Contacts BMLT
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
-Author: bmlt-enabled
+Author: BMLT Authors
 Description: This plugin returns helpline and website info for service bodies Simply add [contacts_bmlt] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server.
-Version: 1.1.2
+Version: 1.1.3
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -121,32 +121,35 @@ if (!class_exists("contactsBmlt")) {
 
         public function contactsBmltMain($atts, $content = null)
         {
-            extract(shortcode_atts(array(
-                "root_server"       => '',
-                'display_type'      => '',
-                'parent_id'         => '',
-                'show_url_in_name'  => '',
-                'show_tel_url'      => '',
-                'show_full_url'     => '',
-                'show_description'  => '',
-                'show_email'        => '',
-                'show_all_services' => '',
-                'show_locations'    => ''
-            ), $atts));
+            $args = shortcode_atts(
+                array(
+                    "root_server"       => '',
+                    'display_type'      => '',
+                    'parent_id'         => '',
+                    'show_url_in_name'  => '',
+                    'show_tel_url'      => '',
+                    'show_full_url'     => '',
+                    'show_description'  => '',
+                    'show_email'        => '',
+                    'show_all_services' => '',
+                    'show_locations'    => ''
+                ),
+                $atts
+            );
 
             $services_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
             $services_dropdown    = $services_data_dropdown[1];
 
-            $parent_id            = ($parent_id         != '' ? $parent_id         : $services_dropdown);
-            $root_server          = ($root_server       != '' ? $root_server       : $this->options['root_server']);
-            $display_type         = ($display_type      != '' ? $display_type      : $this->options['display_type_dropdown']);
-            $show_url_in_name     = ($show_url_in_name  != '' ? $show_url_in_name  : $this->options['show_url_in_name_checkbox']);
-            $show_tel_url         = ($show_tel_url      != '' ? $show_tel_url      : $this->options['show_tel_url_checkbox']);
-            $show_full_url        = ($show_full_url     != '' ? $show_full_url     : $this->options['show_full_url_checkbox']);
-            $show_description     = ($show_description  != '' ? $show_description  : $this->options['show_description_checkbox']);
-            $show_email           = ($show_email        != '' ? $show_email        : $this->options['show_email_checkbox']);
-            $show_all_services    = ($show_all_services != '' ? $show_all_services : $this->options['show_all_services_checkbox']);
-            $show_locations       = ($show_locations    != '' ? $show_locations    : $this->options['show_locations_dropdown']);
+            $parent_id            = ($args['parent_id']         != '' ? $args['parent_id']         : $services_dropdown);
+            $root_server          = ($args['root_server']       != '' ? $args['root_server']       : $this->options['root_server']);
+            $display_type         = ($args['display_type']      != '' ? $args['display_type']      : $this->options['display_type_dropdown']);
+            $show_url_in_name     = ($args['show_url_in_name']  != '' ? $args['show_url_in_name']  : $this->options['show_url_in_name_checkbox']);
+            $show_tel_url         = ($args['show_tel_url']      != '' ? $args['show_tel_url']      : $this->options['show_tel_url_checkbox']);
+            $show_full_url        = ($args['show_full_url']     != '' ? $args['show_full_url']     : $this->options['show_full_url_checkbox']);
+            $show_description     = ($args['show_description']  != '' ? $args['show_description']  : $this->options['show_description_checkbox']);
+            $show_email           = ($args['show_email']        != '' ? $args['show_email']        : $this->options['show_email_checkbox']);
+            $show_all_services    = ($args['show_all_services'] != '' ? $args['show_all_services'] : $this->options['show_all_services_checkbox']);
+            $show_locations       = ($args['show_locations']    != '' ? $args['show_locations']    : $this->options['show_locations_dropdown']);
 
             if ($root_server == '') {
                 return '<p><strong>Contacts BMLT Error: Root Server missing. Please Verify you have entered a Root Server using the \'root_server\' shortcode attribute</strong></p>';
