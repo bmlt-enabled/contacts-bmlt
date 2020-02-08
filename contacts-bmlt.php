@@ -635,7 +635,8 @@ if (!class_exists("contactsBmlt")) {
          *
          * @return string
          */
-        public function getScreenshot($site, $img_tag_attributes = "border='1'") {
+        public function getScreenshot($site, $img_tag_attributes = "border='1'")
+        {
             $image = file_get_contents("https://www.googleapis.com/pagespeedonline/v1/runPagespeed?url=$site&screenshot=true");
             $image = json_decode($image, true);
             $image = $image['screenshot']['data'];
