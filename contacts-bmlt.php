@@ -427,7 +427,7 @@ if (!class_exists("contactsBmlt")) {
          */
         public function getServiceBodiesJson($root_server, $parent_id = null, $show_all_services = null)
         {
-            $serviceBodiesURL =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetServiceBodies"));
+            $serviceBodiesURL =  $this->get($root_server . "/client_interface/json/?switcher=GetServiceBodies");
             $serviceBodies_results = json_decode($serviceBodiesURL, true);
 
             $output = array();
@@ -470,7 +470,7 @@ if (!class_exists("contactsBmlt")) {
          */
         public function getParentServiceBodies($root_server)
         {
-            $serviceBodiesURL =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetServiceBodies"));
+            $serviceBodiesURL =  $this->get($root_server . "/client_interface/json/?switcher=GetServiceBodies");
             $serviceBodies = json_decode($serviceBodiesURL, true);
 
             $parent_body_ids = array();
@@ -637,7 +637,7 @@ if (!class_exists("contactsBmlt")) {
          */
         public function getScreenshot($site, $img_tag_attributes = "border='1'")
         {
-            $image = file_get_contents("https://www.googleapis.com/pagespeedonline/v1/runPagespeed?url=$site&screenshot=true");
+            $image = $this->get("https://www.googleapis.com/pagespeedonline/v1/runPagespeed?url=$site&screenshot=true");
             $image = json_decode($image, true);
             $image = $image['screenshot']['data'];
 
@@ -660,7 +660,7 @@ if (!class_exists("contactsBmlt")) {
             foreach ($serviceBodies as $serviceBody) {
                 $services_query .= '&services[]=' .$serviceBody;
             }
-            $listUrl = file_get_contents($root_server . "/client_interface/json/?switcher=GetSearchResults"
+            $listUrl = $this->get($root_server . "/client_interface/json/?switcher=GetSearchResults"
                 . $services_query
                 . "&data_field_key="
                 . $data_field_key);
@@ -680,6 +680,27 @@ if (!class_exists("contactsBmlt")) {
             }
             $unique_locations_string = rtrim(trim($unique_locations_string), ',');
             return $unique_locations_string;
+        }
+
+        /**
+         * \brief  This is our happy get function.
+         *
+         * @param $url
+         * @param null $cookies
+         *
+         * @return string
+         */
+        public function get($url, $cookies = null)
+        {
+            $args = array(
+                'timeout' => '120',
+                'headers' => array(
+                    'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0) +bmltContacts'
+                ),
+                'cookies' => isset($cookies) ? $cookies : null
+            );
+
+            return wp_remote_retrieve_body(wp_remote_get($url, $args));
         }
     }
     //End Class ContactsBmlt
