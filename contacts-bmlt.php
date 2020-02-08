@@ -4,7 +4,7 @@ Plugin Name: Contacts BMLT
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
 Author: BMLT Authors
 Description: This plugin returns helpline and website info for service bodies Simply add [contacts_bmlt] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server.
-Version: 1.1.3
+Version: 1.1.4
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -132,7 +132,8 @@ if (!class_exists("contactsBmlt")) {
                     'show_description'  => '',
                     'show_email'        => '',
                     'show_all_services' => '',
-                    'show_locations'    => ''
+                    'show_locations'    => '',
+                    'show_screenshot'   => ''
                 ),
                 $atts
             );
@@ -150,6 +151,7 @@ if (!class_exists("contactsBmlt")) {
             $show_email           = ($args['show_email']        != '' ? $args['show_email']        : $this->options['show_email_checkbox']);
             $show_all_services    = ($args['show_all_services'] != '' ? $args['show_all_services'] : $this->options['show_all_services_checkbox']);
             $show_locations       = ($args['show_locations']    != '' ? $args['show_locations']    : $this->options['show_locations_dropdown']);
+            $show_screenshot      = ($args['show_screenshot']   != '' ? $args['show_screenshot']   : $this->options['show_screenshot_checkbox']);
 
             if ($root_server == '') {
                 return '<p><strong>Contacts BMLT Error: Root Server missing. Please Verify you have entered a Root Server using the \'root_server\' shortcode attribute</strong></p>';
@@ -160,13 +162,13 @@ if (!class_exists("contactsBmlt")) {
 
             if ($display_type != '' && $display_type == 'table') {
                 $output .= '<div id="contacts_bmlt_div">';
-                $output .= $this->serviceBodiesJson2Html($service_body_results, false, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url, $show_locations, $root_server);
+                $output .= $this->serviceBodiesJson2Html($service_body_results, false, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url, $show_locations, $root_server, $show_screenshot);
                 $output .= '</div>';
             }
 
             if ($display_type != '' && $display_type == 'block') {
                 $output .= '<div id="contacts_bmlt_div">';
-                $output .= $this->serviceBodiesJson2Html($service_body_results, true, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url, $show_locations, $root_server);
+                $output .= $this->serviceBodiesJson2Html($service_body_results, true, $show_description, $show_url_in_name, $show_tel_url, $show_email, $show_full_url, $show_locations, $root_server, $show_screenshot);
                 $output .= '</div>';
             }
 
@@ -212,6 +214,7 @@ if (!class_exists("contactsBmlt")) {
                 $this->options['show_email_checkbox']        = sanitize_text_field($_POST['show_email_checkbox']);
                 $this->options['show_all_services_checkbox'] = sanitize_text_field($_POST['show_all_services_checkbox']);
                 $this->options['show_locations_dropdown']    = sanitize_text_field($_POST['show_locations_dropdown']);
+                $this->options['show_screenshot_checkbox']   = sanitize_text_field($_POST['show_screenshot_checkbox']);
 
                 $this->saveAdminOptions();
                 echo '<div class="updated"><p>Success! Your changes were successfully saved!</p></div>';
@@ -308,6 +311,10 @@ if (!class_exists("contactsBmlt")) {
                                 <label for="show_all_services_checkbox">Show All Services (This will display all service bodies regardless of whether they have their phone or URL field filled out)</label>
                             </li>
                             <li>
+                                <input type="checkbox" id="show_screenshot_checkbox" name="show_screenshot_checkbox" value="1" <?php echo ($this->options['show_screenshot_checkbox'] == "1" ? "checked" : "") ?>/>
+                                <label for="show_screenshot_checkbox">Show Screenshot (This will display screenshot image of website, Show separate column displaying URL must be checked.)</label>
+                            </li>
+                            <li>
                                 <label for="show_locations_dropdown">Show Locations: </label>
                                 <select style="display:inline;" id="show_locations_dropdown" name="show_locations_dropdown"  class="show_locations_select">
                                     <?php if ($this->options['show_locations_dropdown'] == 'location_municipality') { ?>
@@ -394,7 +401,8 @@ if (!class_exists("contactsBmlt")) {
                     'show_description_checkbox'  => '0',
                     'show_email_checkbox'        => '0',
                     'show_all_services_checkbox' => '0',
-                    'show_locations_dropdown'    => '0'
+                    'show_locations_dropdown'    => '0',
+                    'show_screenshot_checkbox'   => '0'
                 );
                 update_option($this->optionsName, $theOptions);
             }
@@ -516,7 +524,8 @@ if (!class_exists("contactsBmlt")) {
             $show_email = null,         //
             $show_full_url = null,      //
             $show_locations = null,     //
-            $root_server = null         //
+            $root_server = null,         //
+            $show_screenshot = null         //
         ) {
             $ret = '';
             // What we do, is to parse the JSON return. We'll pick out certain fields, and format these into a table or block element return.
@@ -594,10 +603,17 @@ if (!class_exists("contactsBmlt")) {
                                         $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_helpline_div">' : '<td class="bmlt_simple_contact_one_contact_helpline_td">';
                                         $ret .= $phoneNumber;
                                         $ret .= $in_block ? '</div>' : '</td>';
-
-                                        $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_url_div">' : '<td class="bmlt_simple_contact_one_contact_url_td">';
-                                        $ret .= '<a href="' . $url . '">' . $strip_url . '</a>';
-                                        $ret .= $in_block ? '</div>' : '</td>';
+                                        if ($show_screenshot == "1") {
+                                            $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_url_div">' : '<td class="bmlt_simple_contact_one_contact_url_td">';
+                                            if (strlen($url) > 4) {
+                                                $ret .= '<a href="' . $url . '">' . $this->getScreenshot($url) . '</a>';
+                                            }
+                                            $ret .= $in_block ? '</div>' : '</td>';
+                                        } else {
+                                            $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_url_div">' : '<td class="bmlt_simple_contact_one_contact_url_td">';
+                                            $ret .= '<a href="' . $url . '">' . $strip_url . '</a>';
+                                            $ret .= $in_block ? '</div>' : '</td>';
+                                        }
                                     }
                                     $ret .= $in_block ? '</div>' : '</tr>';
                                 }
@@ -611,7 +627,23 @@ if (!class_exists("contactsBmlt")) {
             return $ret;
         }
 
-        /*******************************************************************/
+        /**
+         * \brief  This returns the screenshot for website.
+         *
+         * @param $site
+         * @param string $img_tag_attributes
+         *
+         * @return string
+         */
+        public function getScreenshot($site, $img_tag_attributes = "border='1'") {
+            $image = file_get_contents("https://www.googleapis.com/pagespeedonline/v1/runPagespeed?url=$site&screenshot=true");
+            $image = json_decode($image, true);
+            $image = $image['screenshot']['data'];
+
+            $image = str_replace(array('_', '-'), array('/', '+'), $image);
+            return "<img src=\"data:image/jpeg;base64,".$image."\" $img_tag_attributes />";
+        }
+
         /**
          * \brief  This returns the search results, in whatever form was requested.
          * \returns XHTML data. It will either be a table, or block elements.

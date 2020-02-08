@@ -20,6 +20,7 @@
         <p><strong>show_full_url</strong></p>
         <p><strong>show_all_services</strong></p>
         <p><strong>show_locations</strong></p>
+        <p><strong>show_screenshot</strong></p>
         <p>A minimum of root_server attribute is required.</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot;]</p>
     </div>
@@ -82,5 +83,12 @@
         <p><strong>show_locations</strong></p>
         <p>This will display a list of locations below the service body name. Accepted values are location_neighborhood, location_city_subsection, location_municipality, location_sub_province.</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_locations=&quot;location_municipality"]</p>
+    </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;- show_screenshot</strong></h3>
+    <div>
+        <p><strong>show_screenshot</strong></p>
+        <p>This will display screenshot image of website. Show separate column displaying URL must be checked, or  show_full_url="1" set.<br>
+        *Note this is a beta feature and could time server out with large amounts of links*</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_screenshot="1"]</p>
     </div>
 </div>
