@@ -4,7 +4,7 @@ Plugin Name: Contacts BMLT
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
 Author: BMLT Authors
 Description: This plugin returns helpline and website info for service bodies Simply add [contacts_bmlt] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server.
-Version: 1.1.3
+Version: 1.1.4
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -541,7 +541,7 @@ if (!class_exists("contactsBmlt")) {
                                 $name = htmlspecialchars(trim(stripslashes($serviceBody['name'])));
 
                                 if ($serviceBody['url'] && $show_url_in_name == "1") {
-                                    $service_body_name = '<span class="bmlt_simple_list_service_body_name_text"><a href="' . $url . '">' . $name . '</a></span>';
+                                    $service_body_name = '<span class="bmlt_simple_list_service_body_name_text"><a href="' . $url . '" target="_blank">' . $name . '</a></span>';
                                 } else {
                                     $service_body_name = '<span class="bmlt_simple_list_service_body_name_text">' . $name . '</span>';
                                 }
@@ -596,7 +596,7 @@ if (!class_exists("contactsBmlt")) {
                                         $ret .= $in_block ? '</div>' : '</td>';
 
                                         $ret .= $in_block ? '<div class="bmlt_simple_contact_one_contact_url_div">' : '<td class="bmlt_simple_contact_one_contact_url_td">';
-                                        $ret .= '<a href="' . $url . '">' . $strip_url . '</a>';
+                                        $ret .= '<a href="' . $url . '" target="_blank">' . $strip_url . '</a>';
                                         $ret .= $in_block ? '</div>' : '</td>';
                                     }
                                     $ret .= $in_block ? '</div>' : '</tr>';
