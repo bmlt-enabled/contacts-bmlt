@@ -49,7 +49,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      ZIP_FILENAME: contacts-bmlt-build${GITHUB_RUN_NUMBER}-${GITHUB_SHA}.zip
       S3_BUCKET: archives.bmlt.app
       S3_KEY: contacts-bmlt
       BUILD_DIR: build
@@ -61,8 +60,10 @@ jobs:
     steps:
       - name: Zip file
         run: |
-          find ./ -type d | xargs chmod 755
-          find ./ -name '*.php' | xargs chmod 644
+          export FILENAME=contacts-bmlt-build${GITHUB_RUN_NUMBER}-${GITHUB_SHA}
+          export ZIP_FILENAME=$FILENAME.zip
+          find ./${FILENAME} -type d | xargs chmod 755
+          find ./${FILENAME} -name '*.php' | xargs chmod 644
           zip -r $ZIP_FILENAME ./ -x "*.git*" -x "*.editorconfig*" -x "*.travis.yml*" -x "*assets*" -x "*vendor*" -x "composer.*" -x "*.gitattributes" && mkdir $BUILD_DIR && mv $ZIP_FILENAME $BUILD_DIR/
 
       - name: Before deploy
@@ -71,3 +72,22 @@ jobs:
           mkdir -p $DIST_DIR_GITHUB && cp $BUILD_DIR/$ZIP_FILENAME $DIST_DIR_GITHUB/$GITHUB_RELEASE_FILENAME
           curl -LO https://raw.githubusercontent.com/bmlt-enabled/bmlt-wordpress-deploy/master/deploy-wordpress.sh
           chmod +x deploy-wordpress.sh
+
+#      - name: Upload artifact to S3
+#        id: upload-artifact-to-s3
+#        uses: jakejarvis/s3-sync-action@master
+#        with:
+#          args: --acl public-read --follow-symlinks
+#        env:
+#          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          SOURCE_DIR: $DIST_DIR_S3
+#          DEST_DIR: $S3_KEY
+#
+#      - uses: act10ns/slack@v1
+#        with:
+#          status: ${{ job.status }}
+#          steps: ${{ toJson(steps) }}
+#          channel: '#contacts-bmlt'
+#        if: failure()
