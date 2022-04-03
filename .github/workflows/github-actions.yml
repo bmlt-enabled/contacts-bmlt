@@ -69,11 +69,11 @@ jobs:
           find ./ -type d | xargs chmod 755
           find ./ -name '*.php' | xargs chmod 644
           zip -r $ZIP_FILENAME ./ -x "*.git*" -x "*.editorconfig*" -x "*.travis.yml*" -x "*assets*" -x "*vendor*" -x "composer.*" -x "*.gitattributes" && mkdir $BUILD_DIR && mv $ZIP_FILENAME $BUILD_DIR/
-          ls -la build
 
       - name: Before deploy
         run: |
-          ls -la build
+          echo $BUILD_DIR/$ZIP_FILENAME
+          ls -la $BUILD_DIR/$ZIP_FILENAME
           mkdir -p $DIST_DIR_S3 && cp $BUILD_DIR/$ZIP_FILENAME $DIST_DIR_S3/$ZIP_FILENAME
           mkdir -p $DIST_DIR_GITHUB && cp $BUILD_DIR/$ZIP_FILENAME $DIST_DIR_GITHUB/$GITHUB_RELEASE_FILENAME
           curl -LO https://raw.githubusercontent.com/bmlt-enabled/bmlt-wordpress-deploy/master/deploy-wordpress.sh
