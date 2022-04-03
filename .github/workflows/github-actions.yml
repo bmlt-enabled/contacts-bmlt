@@ -45,3 +45,29 @@ jobs:
           steps: ${{ toJson(steps) }}
           channel: '#contacts-bmlt'
         if: failure()
+
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      ZIP_FILENAME: contacts-bmlt-build${GITHUB_RUN_NUMBER}-${GITHUB_SHA}.zip
+      S3_BUCKET: archives.bmlt.app
+      S3_KEY: contacts-bmlt
+      BUILD_DIR: build
+      DIST_DIR_S3: dist/s3
+      DIST_DIR_GITHUB: dist/github
+      GITHUB_RELEASE_FILENAME: contacts-bmlt.zip
+      PLUGIN: "contacts-bmlt"
+      MAINFILE: "contacts-bmlt.php"
+    steps:
+      - name: Zip file
+        run: |
+          find ./ -type d | xargs chmod 755
+          find ./ -name '*.php' | xargs chmod 644
+          zip -r $ZIP_FILENAME ./ -x "*.git*" -x "*.editorconfig*" -x "*.travis.yml*" -x "*assets*" -x "*vendor*" -x "composer.*" -x "*.gitattributes" && mkdir $BUILD_DIR && mv $ZIP_FILENAME $BUILD_DIR/
+
+      - name: Before deploy
+        run: |
+          mkdir -p $DIST_DIR_S3 && cp $BUILD_DIR/$ZIP_FILENAME $DIST_DIR_S3/$ZIP_FILENAME
+          mkdir -p $DIST_DIR_GITHUB && cp $BUILD_DIR/$ZIP_FILENAME $DIST_DIR_GITHUB/$GITHUB_RELEASE_FILENAME
+          curl -LO https://raw.githubusercontent.com/bmlt-enabled/bmlt-wordpress-deploy/master/deploy-wordpress.sh
+          chmod +x deploy-wordpress.sh
