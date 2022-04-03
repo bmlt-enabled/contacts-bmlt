@@ -49,6 +49,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       S3_BUCKET: archives.bmlt.app
       S3_KEY: contacts-bmlt
       BUILD_DIR: build
@@ -58,12 +59,14 @@ jobs:
       PLUGIN: "contacts-bmlt"
       MAINFILE: "contacts-bmlt.php"
     steps:
+      - uses: actions/checkout@v2
+        id: code-checkout
       - name: Zip file
         run: |
           export FILENAME=contacts-bmlt-build${GITHUB_RUN_NUMBER}-${GITHUB_SHA}
           export ZIP_FILENAME=$FILENAME.zip
-          find ./${FILENAME} -type d | xargs chmod 755
-          find ./${FILENAME} -name '*.php' | xargs chmod 644
+          find ./ -type d | xargs chmod 755
+          find ./ -name '*.php' | xargs chmod 644
           zip -r $ZIP_FILENAME ./ -x "*.git*" -x "*.editorconfig*" -x "*.travis.yml*" -x "*assets*" -x "*vendor*" -x "composer.*" -x "*.gitattributes" && mkdir $BUILD_DIR && mv $ZIP_FILENAME $BUILD_DIR/
 
       - name: Before deploy
