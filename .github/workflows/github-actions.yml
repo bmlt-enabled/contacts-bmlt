@@ -9,12 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      BUILD_DIR: build
-      DIST_DIR_S3: dist/s3
-      DIST_DIR_GITHUB: dist/github
-      GITHUB_RELEASE_FILENAME: contacts-bmlt.zip
-      PLUGIN: "contacts-bmlt"
-      MAINFILE: "contacts-bmlt.php"
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -24,8 +18,34 @@ jobs:
         with:
           php-version: 7.1
 
-      - name: lint
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        id: install-dependencies
+        uses: php-actions/composer@v5
+        with:
+          args: --prefer-dist --no-progress --no-suggest
+
+      - name: Lint
         run: |
-          composer install
           find . -name "*.php" ! -path '*/vendor/*' -print0 | xargs -0 -n1 -P8 php -l
           vendor/squizlabs/php_codesniffer/bin/phpcs --warning-severity=6 --standard=PSR2 --ignore=*/vendor/* --extensions=php --report=summary ./
+
+      - name: PHP Unit Test
+        id: php-unit-test
+        run: vendor/bin/phpunit
+
+      - uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: '#contacts-bmlt'
+        if: failure()
