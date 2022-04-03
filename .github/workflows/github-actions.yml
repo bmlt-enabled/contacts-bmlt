@@ -19,10 +19,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Validate composer.json and composer.lock
-        id: composer-validate
-        run: composer validate
-
       - name: lint
         run: |
           composer install
