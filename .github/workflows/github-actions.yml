@@ -74,21 +74,21 @@ jobs:
           curl -LO https://raw.githubusercontent.com/bmlt-enabled/bmlt-wordpress-deploy/master/deploy-wordpress.sh
           chmod +x deploy-wordpress.sh
 
-#      - name: Upload artifact to S3
-#        id: upload-artifact-to-s3
-#        uses: jakejarvis/s3-sync-action@master
-#        with:
-#          args: --acl public-read --follow-symlinks
-#        env:
-#          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          SOURCE_DIR: $DIST_DIR_S3
-#          DEST_DIR: $S3_KEY
-#
-#      - uses: act10ns/slack@v1
-#        with:
-#          status: ${{ job.status }}
-#          steps: ${{ toJson(steps) }}
-#          channel: '#contacts-bmlt'
-#        if: failure()
+      - name: Upload artifact to S3
+        id: upload-artifact-to-s3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks
+        env:
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: $DIST_DIR_S3
+          DEST_DIR: $S3_KEY
+
+      - uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: '#contacts-bmlt'
+        if: failure()
