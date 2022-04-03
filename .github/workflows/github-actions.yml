@@ -39,10 +39,6 @@ jobs:
           find . -name "*.php" ! -path '*/vendor/*' -print0 | xargs -0 -n1 -P8 php -l
           vendor/squizlabs/php_codesniffer/bin/phpcs --warning-severity=6 --standard=PSR2 --ignore=*/vendor/* --extensions=php --report=summary ./
 
-      - name: PHP Unit Test
-        id: php-unit-test
-        run: vendor/bin/phpunit
-
       - uses: act10ns/slack@v1
         with:
           status: ${{ job.status }}
