@@ -2,9 +2,10 @@
 /*
 Plugin Name: Contacts BMLT
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
+Contributors: pjaudiomv, bmltenabled
 Author: BMLT Authors
 Description: This plugin returns helpline and website info for service bodies Simply add [contacts_bmlt] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server.
-Version: 1.1.5
+Version: 1.2.0
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -105,17 +106,15 @@ if (!class_exists("contactsBmlt")) {
                     'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0) +ContactsBMLT'
                 )
             );
-            $results = wp_remote_get("$root_server/client_interface/serverInfo.xml", $args);
+            $results = wp_remote_get("$root_server/client_interface/json/?switcher=GetServerInfo", $args);
             $httpcode = wp_remote_retrieve_response_code($results);
             $response_message = wp_remote_retrieve_response_message($results);
             if ($httpcode != 200 && $httpcode != 302 && $httpcode != 304 && ! empty($response_message)) {
                 //echo '<p>Problem Connecting to BMLT Root Server: ' . $root_server . '</p>';
                 return false;
             };
-            $results = simplexml_load_string(wp_remote_retrieve_body($results));
-            $results = json_encode($results);
-            $results = json_decode($results, true);
-            return $results['serverVersion']['readableString'];
+            $results = json_decode(wp_remote_retrieve_body($results), true);
+            return $results[0]["version"];
         }
 
         public function contactsBmltMain($atts, $content = null)
