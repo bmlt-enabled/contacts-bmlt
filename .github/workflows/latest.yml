@@ -87,14 +87,6 @@ jobs:
           s3_key: ${{ env.S3_KEY }}
           aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
 
-      - name: Publish Release to Latest WP
-        id: publish_latest
-        uses: bmlt-enabled/wordpress-releases-github-action@v1
-        with:
-          file: ${{ env.DIST_DIR_S3 }}/${{ env.ZIP_FILENAME }}
-          s3_key: ${{ env.S3_KEY }}
-          aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-
       - uses: act10ns/slack@v1
         with:
           status: ${{ job.status }}
