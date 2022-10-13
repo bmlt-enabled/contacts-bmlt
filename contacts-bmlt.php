@@ -5,7 +5,7 @@ Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
 Contributors: pjaudiomv, bmltenabled
 Author: BMLT Authors
 Description: This plugin returns helpline and website info for service bodies Simply add [contacts_bmlt] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server.
-Version: 1.2.1
+Version: 1.2.2
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -114,7 +114,12 @@ if (!class_exists("contactsBmlt")) {
                 return false;
             };
             $results = json_decode(wp_remote_retrieve_body($results), true);
-            return $results[0]["version"];
+            return is_array($results) && array_key_exists("version", $results[0]) ? $results[0]["version"] : '';
+        }
+
+        public function arraySafeGet($arr, $i = 0)
+        {
+            return is_array($arr) ? $arr[$i] ?? '': '';
         }
 
         public function contactsBmltMain($atts, $content = null)
@@ -136,7 +141,7 @@ if (!class_exists("contactsBmlt")) {
             );
 
             $services_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
-            $services_dropdown    = $services_data_dropdown[1];
+            $services_dropdown    = $this->arraySafeGet($services_data_dropdown, 1);
 
             $parent_id            = ($args['parent_id']         != '' ? $args['parent_id']         : $services_dropdown);
             $root_server          = ($args['root_server']       != '' ? $args['root_server']       : $this->options['root_server']);
@@ -246,11 +251,11 @@ if (!class_exists("contactsBmlt")) {
                                         <?php $unique_areas = $this->getParentServiceBodies($this->options['root_server']); ?>
                                         <?php foreach ($unique_areas as $key => $unique_area) { ?>
                                             <?php $area_data          = explode(',', $unique_area); ?>
-                                            <?php $area_name          = $area_data[0]; ?>
-                                            <?php $area_id            = $area_data[1]; ?>
+                                            <?php $area_name          = $this->arraySafeGet($area_data); ?>
+                                            <?php $area_id            = $this->arraySafeGet($area_data, 1); ?>
                                             <?php $option_description = $area_name . " (" . $area_id . ")" ?>
                                             <?php $is_data = explode(',', esc_html($this->options['service_body_dropdown'])); ?>
-                                            <?php if ($area_id == $is_data[1]) { ?>
+                                            <?php if ($area_id == $this->arraySafeGet($is_data, 1)) { ?>
                                                 <option selected="selected" value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
                                             <?php } else { ?>
                                                 <option value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
