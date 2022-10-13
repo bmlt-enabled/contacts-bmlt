@@ -1,6 +1,7 @@
 COMMIT := $(shell git rev-parse --short=8 HEAD)
 ZIP_FILENAME := $(or $(ZIP_FILENAME), $(shell echo "$${PWD\#\#*/}.zip"))
 BUILD_DIR := $(or $(BUILD_DIR),"build")
+VENDOR_AUTOLOAD := vendor/autoload.php
 
 help:  ## Print the help documentation
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -14,14 +15,16 @@ build:  ## Build
 clean:  ## clean
 	rm -rf build dist
 
-.PHONY: composer
-composer:  ## Composer Install
+$(VENDOR_AUTOLOAD):
 	composer install --prefer-dist --no-progress
 
+.PHONY: composer
+composer: $(VENDOR_AUTOLOAD) ## Runs composer install
+
 .PHONY: lint
-lint:  ## PHP Lint
+lint: composer ## PHP Lint
 	vendor/squizlabs/php_codesniffer/bin/phpcs
 
 .PHONY: lint-fix
-lint-fix:  ## PHP Lint Fix
+lint-fix: composer ## PHP Lint Fix
 	vendor/squizlabs/php_codesniffer/bin/phpcbf
