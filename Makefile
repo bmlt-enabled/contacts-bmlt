@@ -16,7 +16,7 @@ clean:  ## clean
 
 .PHONY: composer
 composer:  ## Composer Install
-	composer install --prefer-dist --no-progress --no-suggest
+	composer install --prefer-dist --no-progress
 
 .PHONY: lint
 lint:  ## PHP Lint
