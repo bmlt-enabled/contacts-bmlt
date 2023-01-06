@@ -5,3 +5,5 @@
 .idea
 vendor/
 logs/
+build/
+*.zip
