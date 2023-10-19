@@ -3,7 +3,7 @@
 Contributors: pjaudiomv, bmltenabled
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
 Tags: bmlt, basic meeting list toolbox, Contacts, narcotics anonymous, na
-Requires PHP: 7.4
+Requires PHP: 8.0
 Tested up to: 6.3.2
 Stable tag: 1.3.0
 License: GPLv2 or later
@@ -80,6 +80,7 @@ This section describes how to install the plugin and get it working.
 
 = 1.3.0 =
 
+* Note this version requires BMLT Root Server version 3.04 or greater.
 * Refactored codebase.
 
 = 1.2.2 =

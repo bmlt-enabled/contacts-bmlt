@@ -28,16 +28,33 @@ use ContactsBmlt\Shortcode;
 class ContactsBmlt
 // phpcs:enable PSR1.Classes.ClassDeclaration.MissingNamespace
 {
-    public $options = [];
-
+    /**
+     * Singleton instance of the class.
+     *
+     * @var null|self
+     */
     private static $instance = null;
 
+    /**
+     * Initialize the plugin and set up its functionality.
+     *
+     * This constructor function is called when an instance of the plugin class is created.
+     * It hooks the 'pluginSetup' method to the 'init' action, which sets up the plugin's functionality.
+     */
     public function __construct()
     {
         add_action('init', [$this, 'pluginSetup']);
     }
 
-    public function pluginSetup()
+    /**
+     * Set up the plugin's functionality and actions.
+     *
+     * This function is responsible for setting up various actions and hooks based on whether
+     * the current context is in the WordPress admin or frontend.
+     * - In the admin context, it adds menu options and enqueues backend files.
+     * - In the frontend context, it enqueues frontend files and registers a shortcode for displaying meetings.
+     */
+    public function pluginSetup(): void
     {
         if (is_admin()) {
             add_action('admin_menu', [$this, 'optionsMenu']);
@@ -48,19 +65,41 @@ class ContactsBmlt
         }
     }
 
-    public function optionsMenu()
+    /**
+     * Set up the plugin settings menu page.
+     *
+     * This function is responsible for setting up the plugin's settings menu page in the WordPress admin panel.
+     * It creates a menu using the Settings class and associates it with the plugin file.
+     */
+    public function optionsMenu(): void
     {
         $dashboard = new Settings();
         $dashboard->createMenu(plugin_basename(__FILE__));
     }
 
-    public function showContacts($atts)
+    /**
+     * Display contacts using a shortcode.
+     *
+     * This function is used to display meetings on a WordPress page or post using a shortcode.
+     * It creates a new instance of the Shortcode class and renders the shortcode with the provided attributes.
+     *
+     * @param array $atts An associative array of attributes passed to the shortcode.
+     * @return string The rendered content of the shortcode.
+     */
+    public function showContacts($atts): string
     {
         $shortcode = new Shortcode();
         return $shortcode->render($atts);
     }
 
-    public function enqueueBackendFiles($hook)
+    /**
+     * Enqueue backend CSS and JavaScript files for the plugin.
+     *
+     * This function enqueues the necessary CSS and JavaScript files for the plugin's backend settings page.
+     *
+     * @param string $hook The current admin page's hook name.
+     */
+    public function enqueueBackendFiles(string $hook): void
     {
         if ($hook !== 'settings_page_contacts-bmlt') {
             return;
@@ -74,12 +113,24 @@ class ContactsBmlt
         wp_enqueue_script('jquery-ui-accordion');
     }
 
-    public function enqueueFrontendFiles($hook)
+    /**
+     * Enqueue frontend CSS files for the plugin.
+     *
+     * This function enqueues the 'upcoming meetings' CSS file for use in the frontend.
+     * It is typically used to include stylesheets required for displaying content or features
+     * on the public-facing side of the website.
+     */
+    public function enqueueFrontendFiles(): void
     {
-        wp_enqueue_style('contacts-bmlt', plugin_dir_url(__FILE__) . 'css/contacts_bmlt.css', false, '1.20	', 'all');
+        wp_enqueue_style('contacts-bmlt', plugin_dir_url(__FILE__) . 'css/contacts_bmlt.css', false, '1.21	', 'all');
     }
 
-    public static function getInstance()
+    /**
+     * Get the instance of the class (Singleton pattern).
+     *
+     * @return self The instance of the class.
+     */
+    public static function getInstance(): self
     {
         if (self::$instance == null) {
             self::$instance = new self();

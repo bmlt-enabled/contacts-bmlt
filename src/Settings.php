@@ -4,12 +4,24 @@ namespace ContactsBmlt;
 
 require_once 'Helpers.php';
 
+/**
+ * Class Shortcode
+ * @package Settings
+ */
 class Settings
 {
+    /**
+     * Instance of the Helpers class.
+     *
+     * @var Helpers
+     */
     private $helper;
     public $optionsName = 'contacts_bmlt_options';
     public $options = [];
 
+    /**
+     * Constructor for the Settings class.
+     */
     public function __construct()
     {
         $this->getOptions();
@@ -17,6 +29,14 @@ class Settings
         add_action("admin_notices", [$this, "isRootServerMissing"]);
     }
 
+    /**
+     * Create the admin menu for the plugin.
+     *
+     * This function adds an options page to the WordPress admin menu and registers a plugin action link.
+     *
+     * @param string $baseFile The base file of the plugin.
+     * @return void
+     */
     public function createMenu(string $baseFile): void
     {
         add_options_page(
@@ -30,7 +50,14 @@ class Settings
         add_filter('plugin_action_links_' . $baseFile, [$this, 'filterPluginActions'], 10, 2);
     }
 
-    public function adminOptionsPage()
+    /**
+     * Display the admin options page and handle form submissions.
+     *
+     * This function handles the display of the admin options page and processes form submissions.
+     *
+     * @return void
+     */
+    public function adminOptionsPage(): void
     {
         if (!empty($_POST['contactsbmltsave']) && wp_verify_nonce($_POST['_wpnonce'], 'contactsbmltupdate-options')) {
             $this->updateAdminOptions();
@@ -40,7 +67,14 @@ class Settings
     }
 
 
-    private function updateAdminOptions()
+    /**
+     * Update the admin options based on POST data.
+     *
+     * This function updates the plugin's options based on the POST data received from the admin settings form.
+     *
+     * @return void
+     */
+    private function updateAdminOptions(): void
     {
         $this->options['root_server'] = isset($_POST['root_server']) ? esc_url_raw($_POST['root_server']) : '';
         $this->options['service_body_dropdown'] = isset($_POST['service_body_dropdown']) ? sanitize_text_field($_POST['service_body_dropdown']) : '';
@@ -55,12 +89,26 @@ class Settings
         $this->saveAdminOptions();
     }
 
-    private function printSuccessMessage()
+    /**
+     * Display a success message.
+     *
+     * This function outputs a success message indicating that changes were successfully saved.
+     *
+     * @return void
+     */
+    private function printSuccessMessage(): void
     {
         echo '<div class="updated"><p>Success! Your changes were successfully saved!</p></div>';
     }
 
-    private function getConnectionStatus()
+    /**
+     * Get the connection status to the BMLT Root Server.
+     *
+     * This function tests the connection to the BMLT Root Server and returns the status and a message.
+     *
+     * @return array An associative array with 'msg' and 'status' keys indicating the status and message.
+     */
+    private function getConnectionStatus(): array
     {
         $this_connected = $this->helper->testRootServer($this->options['root_server']);
         return $this_connected ? [
@@ -72,7 +120,14 @@ class Settings
         ];
     }
 
-    private function printAdminForm()
+    /**
+     * Display the admin settings form for the plugin.
+     *
+     * This function generates and displays the admin settings form for the plugin.
+     *
+     * @return void
+     */
+    private function printAdminForm(): void
     {
         $connectionStatus = $this->getConnectionStatus();
         $serviceBodies = $this->helper->getServiceBodies($this->options['root_server']);
@@ -170,13 +225,13 @@ class Settings
                             <label for="show_locations_dropdown">Show Locations: </label>
                             <select style="display:inline;" id="show_locations_dropdown" name="show_locations_dropdown" class="show_locations_select">
                                 <?php
-                                $options = array(
+                                $options = [
                                     'location_municipality'     => 'City',
                                     'location_city_subsection'  => 'City Subsection',
                                     'location_sub_province'     => 'County',
                                     'location_neighborhood'     => 'Neighborhood',
                                     '0'                         => 'NONE'
-                                );
+                                ];
 
                                 $selectedOption = $this->options['show_locations_dropdown'];
 
@@ -200,12 +255,14 @@ class Settings
 
 
     /**
-     * @desc Adds the Settings link to the plugin activate/deactivate page
-     * @param $links
-     * @param $file
-     * @return mixed
+     * Filter the plugin action links displayed on the Plugins page.
+     *
+     * This function adds a "Settings" link to the plugin's action links on the Plugins page in the WordPress admin.
+     *
+     * @param array $links The array of action links.
+     * @return array The modified array of action links.
      */
-    public function filterPluginActions($links)
+    public function filterPluginActions(array $links): array
     {
         // If your plugin is under a different top-level menu than Settings (IE - you changed the function above to something other than add_options_page)
         // Then you're going to want to change options-general.php below to the name of your top-level page
@@ -215,7 +272,15 @@ class Settings
         return $links;
     }
 
-    public function getOptions()
+    /**
+     * Retrieves and initializes plugin options.
+     *
+     * This function retrieves the plugin options from WordPress options and initializes
+     * default values if the options do not exist.
+     *
+     * @return void
+     */
+    public function getOptions(): void
     {
         // Don't forget to set up the default options
         if (!$theOptions = get_option($this->optionsName)) {
@@ -236,17 +301,27 @@ class Settings
         $this->options = $theOptions;
         $this->options['root_server'] = untrailingslashit(preg_replace('/^(.*)\/(.*php)$/', '$1', $this->options['root_server']));
     }
+
     /**
-     * Saves the admin options to the database.
+     * Saves the admin options for the plugin.
+     *
+     * This function updates the BMLT Root Server option and saves it in the WordPress options.
+     *
+     * @return void
      */
-    public function saveAdminOptions()
+    public function saveAdminOptions(): void
     {
         $this->options['root_server'] = untrailingslashit(preg_replace('/^(.*)\/(.*php)$/', '$1', $this->options['root_server']));
         update_option($this->optionsName, $this->options);
         return;
     }
 
-    public function isRootServerMissing()
+    /**
+     * Checks if the BMLT Root Server is missing in the plugin settings.
+     *
+     * @return void
+     */
+    public function isRootServerMissing(): void
     {
         $root_server = $this->options['root_server'];
         if (empty($root_server)) {
