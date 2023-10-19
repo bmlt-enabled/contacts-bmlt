@@ -5,8 +5,8 @@ namespace ContactsBmlt;
 require_once 'Helpers.php';
 
 /**
- * Class Shortcode
- * @package Settings
+ * Class Settings
+ * @package ContactsBmlt
  */
 class Settings
 {
