@@ -44,6 +44,10 @@ class Shortcode
         }
 
         $serviceBodies = $this->helper->getServiceBodies($args['root_server']);
+        if (empty($serviceBodies)) {
+            return '<p><strong>Contacts BMLT Error: Unable to fetch service bodies from the root server. Please check your connection or server URL.</strong></p>';
+        }
+
         $service_body_results = $this->helper->getFilteredServiceBodies($serviceBodies, $args['parent_id'], $args['show_all_services']);
 
         if ($args['display_type'] != '') {
