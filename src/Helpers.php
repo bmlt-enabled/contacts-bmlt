@@ -116,7 +116,12 @@ class Helpers
      */
     public function getServiceBodies(string $rootServer): array
     {
-        return $this->getRemoteResponse($rootServer, [], 'GetServiceBodies');
+        $response = $this->getRemoteResponse($rootServer, [], 'GetServiceBodies');
+        // Check if there's an error in the response and return an empty array
+        if (isset($response['error'])) {
+            return [];
+        }
+        return $response;
     }
 
     /**

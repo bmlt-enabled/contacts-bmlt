@@ -130,7 +130,13 @@ class Settings
     private function printAdminForm(): void
     {
         $connectionStatus = $this->getConnectionStatus();
-        $serviceBodies = $this->helper->getServiceBodies($this->options['root_server']);
+        $serviceBodies = [];
+
+        // Only try to get service bodies if we have a valid connection
+        if ($connectionStatus['status']) {
+            $serviceBodies = $this->helper->getServiceBodies($this->options['root_server']);
+        }
+
         ?>
         <div class="wrap">
             <h2>Contacts BMLT</h2>
@@ -159,7 +165,7 @@ class Settings
                             <label for="service_body_dropdown">Default Service Body Parent: </label>
                             <select id="service_body_dropdown" name="service_body_dropdown" class="contacts_bmlt_service_body_select">
                                 <?php
-                                if ($connectionStatus['status']) {
+                                if ($connectionStatus['status'] && !empty($serviceBodies)) {
                                     $unique_areas = $this->helper->getParentServiceBodies($serviceBodies);
                                     $current_selected = explode(',', esc_html($this->options['service_body_dropdown']));
                                     foreach ($unique_areas as $unique_area) {
@@ -171,7 +177,12 @@ class Settings
                                         echo "<option $selected value='$unique_area'>$option_description</option>";
                                     }
                                 } else {
-                                    echo "<option selected='selected' value='{$this->options['service_body_dropdown']}'>Not Connected - Can not get Service Bodies</option>";
+                                    // Keep any existing value if we can't connect
+                                    if (!empty($this->options['service_body_dropdown'])) {
+                                        echo "<option selected='selected' value='{$this->options['service_body_dropdown']}'>Not Connected - Can not get Service Bodies</option>";
+                                    } else {
+                                        echo "<option selected='selected' value='All Service Bodies,000'>All Service Bodies (000)</option>";
+                                    }
                                 }
                                 ?>
                             </select>
