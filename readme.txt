@@ -5,7 +5,7 @@ Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
 Tags: bmlt, basic meeting list toolbox, Contacts, narcotics anonymous, na
 Requires PHP: 8.0
 Tested up to: 6.3.2
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,11 @@ This section describes how to install the plugin and get it working.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.3.2 =
+
+* version bump.
+
 
 = 1.3.1 =
 
