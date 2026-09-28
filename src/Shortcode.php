@@ -36,10 +36,14 @@ class Shortcode
     {
         $defaults = $this->getDefaultValues();
         $args = shortcode_atts($defaults, $atts);
+        // An explicit parent_id in the shortcode should not be overridden by the default services setting
+        if (is_array($atts) && isset($atts['parent_id']) && !isset($atts['services'])) {
+            $args['services'] = '';
+        }
         if (empty($args['root_server'])) {
             return '<p><strong>Contacts BMLT Error: Root Server missing. Please Verify you have entered a Root Server.</strong></p>';
         }
-        if (empty($args['parent_id'])) {
+        if (empty($args['parent_id']) && empty($args['services'])) {
             return '<p><strong>Contacts BMLT Error: Service Body missing. Please verify you have entered a service body id.</strong></p>';
         }
 
@@ -48,13 +52,13 @@ class Shortcode
             return '<p><strong>Contacts BMLT Error: Unable to fetch service bodies from the root server. Please check your connection or server URL.</strong></p>';
         }
 
-        $service_body_results = $this->helper->getFilteredServiceBodies($serviceBodies, $args['parent_id'], $args['show_all_services']);
+        $service_body_results = $this->helper->getFilteredServiceBodies($serviceBodies, $args['parent_id'], $args['show_all_services'], $args['services']);
 
         if ($args['display_type'] != '') {
             $content .= '<div id="contacts_bmlt_div">';
             $isBlock = ($args['display_type'] == 'block');
 
-            $content .= $this->serviceBodiesJson2Html($service_body_results, $isBlock, $args['show_description'], $args['show_url_in_name'], $args['show_tel_url'], $args['show_email'], $args['showFullUrl'], $args['show_locations'], $args['root_server']);
+            $content .= $this->serviceBodiesJson2Html($service_body_results, $isBlock, $args['show_description'], $args['show_url_in_name'], $args['show_tel_url'], $args['show_email'], $args['showFullUrl'], $args['show_locations'], $args['root_server'], $args['group_by_state']);
             $content .= '</div>';
         }
 
@@ -77,6 +81,8 @@ class Shortcode
             "root_server"       => $this->settings->options['root_server'],
             'display_type'      => $this->settings->options['display_type_dropdown'],
             'parent_id'         => $services_dropdown,
+            'services'          => $this->settings->options['services_select'] ?? '',
+            'group_by_state'    => $this->settings->options['group_by_state_checkbox'] ?? '',
             'show_url_in_name'  => $this->settings->options['show_url_in_name_checkbox'],
             'show_tel_url'      => $this->settings->options['show_tel_url_checkbox'],
             'showFullUrl'       => $this->settings->options['show_full_url_checkbox'],
@@ -105,6 +111,7 @@ class Shortcode
      * @param bool|null $showFullUrl Whether to display the full website URL.
      * @param bool|null $showLocations Whether to display the locations list.
      * @param string|null $rootServer The root URL of the remote server to fetch location data (optional).
+     * @param bool|null $groupByState Whether to group the locations list by state (optional).
      *
      * @return string The generated HTML content for the service bodies' contact information.
      */
@@ -117,7 +124,8 @@ class Shortcode
         $showEmail = null,
         $showFullUrl = null,
         $showLocations = null,
-        $rootServer = null
+        $rootServer = null,
+        $groupByState = null
     ) {
         if (!$results || !is_array($results) || !count($results)) {
             return '';
@@ -134,7 +142,7 @@ class Shortcode
         }
         foreach ($results as $serviceBody) {
             if (isset($serviceBody) && is_array($serviceBody) && count($serviceBody)) {
-                $ret .= $this->processServiceBody($serviceBody, $inBlock, $showDescription, $showUrlInName, $showTelUrl, $showEmail, $showFullUrl, $showLocations, $locations);
+                $ret .= $this->processServiceBody($serviceBody, $inBlock, $showDescription, $showUrlInName, $showTelUrl, $showEmail, $showFullUrl, $showLocations, $locations, $groupByState == "1");
             }
         }
 
@@ -173,6 +181,7 @@ class Shortcode
      * @param bool $showFullUrl Whether to display the full website URL.
      * @param string $showLocations Whether to display the locations list.
      * @param array $locations An array of location data, each represented as an associative array.
+     * @param bool $groupByState Whether to group the locations list by state.
      *
      * @return string The generated HTML content for the service body's contact information.
      */
@@ -185,12 +194,13 @@ class Shortcode
         bool $showEmail,
         bool $showFullUrl,
         string $showLocations,
-        array $locations
+        array $locations,
+        bool $groupByState = false
     ): string {
         $serviceBodyData = $this->extractServiceBodyData($serviceBody);
         $serviceBodyName = $this->generateServiceBodyName($serviceBodyData['name'], $serviceBodyData['url'], $showUrlInName);
         $phoneNumber = $this->generatePhoneNumber($serviceBodyData['helpline'], $showTelUrl);
-        $locationsList = $this->generateLocationsList($serviceBody['id'], $showLocations, $locations);
+        $locationsList = $this->generateLocationsList($serviceBody['id'], $showLocations, $locations, $groupByState);
         return $this->generateHTML(
             $serviceBodyData,
             $inBlock,
@@ -301,19 +311,20 @@ class Shortcode
      * @param int $id The identifier for the service body.
      * @param string $showLocations Whether to display the locations list.
      * @param array $locations An array of location data, each represented as an associative array.
+     * @param bool $groupByState Whether to group the locations list by state.
      *
      * @return string The formatted list of locations enclosed in a <span> element with the appropriate CSS class.
      */
-    private function generateLocationsList(int $id, string $showLocations, array $locations): string
+    private function generateLocationsList(int $id, string $showLocations, array $locations, bool $groupByState = false): string
     {
         if (!$showLocations) {
             return '';
         }
         $location_values = ["location_neighborhood", "location_city_subsection", "location_municipality", "location_sub_province"];
         if (in_array($showLocations, $location_values)) {
-            return '<span class="bmlt_simple_contacts_locations_text">' . $this->helper->getLocationsList($locations, $id, $showLocations) . '</span>';
+            return '<span class="bmlt_simple_contacts_locations_text">' . $this->helper->getLocationsList($locations, $id, $showLocations, $groupByState) . '</span>';
         }
-        return '<span class="bmlt_simple_contacts_locations_text">' . $this->helper->getLocationsList($locations, $id, 'location_municipality') . '</span>';
+        return '<span class="bmlt_simple_contacts_locations_text">' . $this->helper->getLocationsList($locations, $id, 'location_municipality', $groupByState) . '</span>';
     }
 
     /**

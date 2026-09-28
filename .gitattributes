@@ -10,3 +10,8 @@ Makefile export-ignore
 /docs export-ignore
 /.github export-ignore
 .phpcs.xml export-ignore
+Dockerfile.test export-ignore
+docker-compose.test.yml export-ignore
+phpunit.xml export-ignore
+/bin export-ignore
+/tests export-ignore

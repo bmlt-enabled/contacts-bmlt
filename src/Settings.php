@@ -86,7 +86,10 @@ class Settings
         $this->options['show_email_checkbox'] = isset($_POST['show_email_checkbox']) ? sanitize_text_field($_POST['show_email_checkbox']) : '';
         $this->options['show_all_services_checkbox'] = isset($_POST['show_all_services_checkbox']) ? sanitize_text_field($_POST['show_all_services_checkbox']) : '';
         $this->options['show_locations_dropdown'] = isset($_POST['show_locations_dropdown']) ? sanitize_text_field($_POST['show_locations_dropdown']) : '';
+        $this->options['services_select'] = isset($_POST['services_select']) ? implode(',', Helpers::parseIds(wp_unslash($_POST['services_select']))) : '';
+        $this->options['group_by_state_checkbox'] = isset($_POST['group_by_state_checkbox']) ? sanitize_text_field($_POST['group_by_state_checkbox']) : '';
         $this->saveAdminOptions();
+        Helpers::clearCache();
     }
 
     /**
@@ -188,6 +191,33 @@ class Settings
                             </select>
                         </li>
                     </ul>
+                    <h3>Specific Service Bodies</h3>
+                    <p>Optional. If any are selected only these service bodies are displayed (child service bodies are not included) and the parent above is ignored.</p>
+                    <ul>
+                        <li>
+                            <label for="services_select">Default Service Bodies: </label>
+                            <select id="services_select" name="services_select[]" multiple="multiple" class="contacts_bmlt_service_body_select" data-placeholder="Select service bodies">
+                                <?php
+                                $selectedServices = Helpers::parseIds($this->options['services_select'] ?? '');
+                                if ($connectionStatus['status'] && !empty($serviceBodies)) {
+                                    usort($serviceBodies, function ($a, $b) {
+                                        return strnatcasecmp($a['name'], $b['name']);
+                                    });
+                                    foreach ($serviceBodies as $serviceBody) {
+                                        $id = absint($serviceBody['id']);
+                                        $selected = in_array($id, $selectedServices, true) ? 'selected="selected"' : '';
+                                        echo '<option ' . $selected . ' value="' . esc_attr($id) . '">' . esc_html($serviceBody['name'] . ' (' . $id . ')') . '</option>';
+                                    }
+                                } else {
+                                    // Keep any existing selection if we can't connect
+                                    foreach ($selectedServices as $id) {
+                                        echo '<option selected="selected" value="' . esc_attr($id) . '">' . esc_html($id) . '</option>';
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </li>
+                    </ul>
                 </div>
 
                 <div style="margin-top: 20px; padding: 0 15px;" class="postbox">
@@ -254,6 +284,10 @@ class Settings
                             </select>
                             <label for="show_locations_dropdown"> (This will display a list of locations below the service body name)</label>
                         </li>
+                        <li>
+                            <input type="checkbox" id="group_by_state_checkbox" name="group_by_state_checkbox" value="1" <?php echo (($this->options['group_by_state_checkbox'] ?? '') == "1" ? "checked" : "") ?>/>
+                            <label for="group_by_state_checkbox">Group locations by state (only applies when Show Locations is set)</label>
+                        </li>
                     </ul>
                 </div>
                 <input type="submit" value="SAVE CHANGES" name="contactsbmltsave" class="button-primary" />
@@ -305,7 +339,9 @@ class Settings
                 'show_description_checkbox'  => '0',
                 'show_email_checkbox'        => '0',
                 'show_all_services_checkbox' => '0',
-                'show_locations_dropdown'    => '0'
+                'show_locations_dropdown'    => '0',
+                'services_select'            => '',
+                'group_by_state_checkbox'    => '0'
             );
             update_option($this->optionsName, $theOptions);
         }
