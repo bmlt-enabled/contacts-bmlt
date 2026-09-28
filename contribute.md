@@ -8,7 +8,7 @@ We are using [bmlt-wordpress-deploy](https://github.com/bmlt-enabled/bmlt-wordpr
 
 To get things going in your local environment.
 
-`docker-compose up`
+`docker compose up`
 
 Get your wordpress installation going.  Remember your admin password.  Once it's up, login to admin and activate the "Contacts BMLT" plugin.
 

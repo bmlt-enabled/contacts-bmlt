@@ -35,7 +35,7 @@ docs:  ## Generate Docs
 
 .PHONY: dev
 dev:  ## Docker up
-	docker-compose up
+	docker compose up
 
 .PHONY: test
 test:  ## Run tests in Docker (builds fresh each time, no local DB needed)
