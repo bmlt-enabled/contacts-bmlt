@@ -61,3 +61,9 @@ div#contacts_bmlt_div div.bmlt_simple_contact_one_contact_helpline_no_full_url_d
 	float:left;
 	width:60%;
 }
+
+
+span.bmlt_simple_contacts_locations_state_name
+{
+	font-weight:bold;
+}

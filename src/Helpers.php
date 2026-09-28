@@ -29,6 +29,36 @@ class Helpers
     ];
 
     /**
+     * Default number of seconds to cache root server responses.
+     *
+     * Can be changed with the 'contacts_bmlt_cache_ttl' filter, returning 0 disables caching.
+     */
+    const CACHE_TTL = HOUR_IN_SECONDS;
+
+    /**
+     * Option holding the current cache version, changing it invalidates all cached responses.
+     */
+    const CACHE_VERSION_OPTION = 'contacts_bmlt_cache_version';
+
+    /**
+     * US state and territory abbreviations mapped to their full names.
+     */
+    const STATE_NAMES = [
+        'AL' => 'Alabama', 'AK' => 'Alaska', 'AZ' => 'Arizona', 'AR' => 'Arkansas', 'CA' => 'California',
+        'CO' => 'Colorado', 'CT' => 'Connecticut', 'DE' => 'Delaware', 'FL' => 'Florida', 'GA' => 'Georgia',
+        'HI' => 'Hawaii', 'ID' => 'Idaho', 'IL' => 'Illinois', 'IN' => 'Indiana', 'IA' => 'Iowa',
+        'KS' => 'Kansas', 'KY' => 'Kentucky', 'LA' => 'Louisiana', 'ME' => 'Maine', 'MD' => 'Maryland',
+        'MA' => 'Massachusetts', 'MI' => 'Michigan', 'MN' => 'Minnesota', 'MS' => 'Mississippi', 'MO' => 'Missouri',
+        'MT' => 'Montana', 'NE' => 'Nebraska', 'NV' => 'Nevada', 'NH' => 'New Hampshire', 'NJ' => 'New Jersey',
+        'NM' => 'New Mexico', 'NY' => 'New York', 'NC' => 'North Carolina', 'ND' => 'North Dakota', 'OH' => 'Ohio',
+        'OK' => 'Oklahoma', 'OR' => 'Oregon', 'PA' => 'Pennsylvania', 'RI' => 'Rhode Island', 'SC' => 'South Carolina',
+        'SD' => 'South Dakota', 'TN' => 'Tennessee', 'TX' => 'Texas', 'UT' => 'Utah', 'VT' => 'Vermont',
+        'VA' => 'Virginia', 'WA' => 'Washington', 'WV' => 'West Virginia', 'WI' => 'Wisconsin', 'WY' => 'Wyoming',
+        'DC' => 'District of Columbia', 'PR' => 'Puerto Rico', 'VI' => 'U.S. Virgin Islands', 'GU' => 'Guam',
+        'AS' => 'American Samoa', 'MP' => 'Northern Mariana Islands'
+    ];
+
+    /**
      * Safely retrieve a value from an associative array.
      *
      * This static method allows you to safely retrieve a value from an associative array
@@ -53,15 +83,26 @@ class Helpers
      * @param string $rootServer The root server URL to send the request to.
      * @param array $queryParams (optional) An associative array of query parameters to include in the request.
      * @param string $switcher (optional) The switcher parameter for the API request. Defaults to 'GetSearchResults'.
+     * @param bool $useCache (optional) Whether to read and store the response in a transient. Defaults to true.
      * @return array An associative array representing the JSON response or an error message.
      */
-    private function getRemoteResponse(string $rootServer, array $queryParams = [], string $switcher = 'GetSearchResults'): array
+    private function getRemoteResponse(string $rootServer, array $queryParams = [], string $switcher = 'GetSearchResults', bool $useCache = true): array
     {
 
         $url = $rootServer . self::BASE_API_ENDPOINT . $switcher;
 
         if (!empty($queryParams)) {
             $url .= '&' . http_build_query($queryParams);
+        }
+
+        $cacheTtl = (int) apply_filters('contacts_bmlt_cache_ttl', self::CACHE_TTL);
+        $useCache = $useCache && $cacheTtl > 0;
+        $cacheKey = 'contacts_bmlt_' . md5(get_option(self::CACHE_VERSION_OPTION, '') . $url);
+        if ($useCache) {
+            $cached = get_transient($cacheKey);
+            if (is_array($cached)) {
+                return $cached;
+            }
         }
 
         $response = wp_remote_get($url, self::HTTP_RETRIEVE_ARGS);
@@ -77,7 +118,37 @@ class Helpers
         if (empty($data)) {
             return ['error' => 'Received empty data from server.'];
         }
+        if ($useCache) {
+            set_transient($cacheKey, $data, $cacheTtl);
+        }
         return $data;
+    }
+
+    /**
+     * Invalidate all cached root server responses.
+     *
+     * Rather than deleting each transient, the cache version is changed so old keys are never read again
+     * and expire on their own.
+     *
+     * @return void
+     */
+    public static function clearCache(): void
+    {
+        update_option(self::CACHE_VERSION_OPTION, uniqid('', true));
+    }
+
+    /**
+     * Parse a comma separated list (or array) of service body ids into unique positive integers.
+     *
+     * @param mixed $ids A comma separated string or array of ids.
+     * @return array An array of unique integer ids.
+     */
+    public static function parseIds($ids): array
+    {
+        if (!is_array($ids)) {
+            $ids = explode(',', (string) $ids);
+        }
+        return array_values(array_unique(array_filter(array_map('absint', $ids))));
     }
 
 
@@ -97,7 +168,7 @@ class Helpers
         if (!$rootServer) {
             return '';
         }
-        $response = $this->getRemoteResponse($rootServer, [], 'GetServerInfo');
+        $response = $this->getRemoteResponse($rootServer, [], 'GetServerInfo', false);
         if (isset($response['error'])) {
             return $response['error'];
         }
@@ -171,10 +242,11 @@ class Helpers
      * @param array $serviceBodies An array of service bodies, each represented as an associative array.
      * @param string|null $parentId The ID of the parent service body to filter by, or null to include all service bodies.
      * @param string|null $showAllServices A flag to determine whether to include all services (1) or only those with helplines or URLs (null or 0).
+     * @param string|null $services (optional) A comma separated list of exact service body ids to display, overrides $parentId when set.
      *
      * @return array An array of filtered service bodies.
      */
-    public function getFilteredServiceBodies(array $serviceBodies, $parentId = null, $showAllServices = null): array
+    public function getFilteredServiceBodies(array $serviceBodies, $parentId = null, $showAllServices = null, $services = null): array
     {
         // decide if a service body should be added to output
         $shouldAddToOutput = function ($serviceBody) use ($showAllServices) {
@@ -185,8 +257,16 @@ class Helpers
         };
 
         $output = [];
+        $serviceIds = self::parseIds($services);
+        $parentIds = self::parseIds($parentId);
 
-        if ($parentId === "000") {
+        if ($serviceIds) {
+            foreach ($serviceBodies as $serviceBody) {
+                if (in_array((int) $serviceBody['id'], $serviceIds, true) && $shouldAddToOutput($serviceBody)) {
+                    $output[] = $serviceBody;
+                }
+            }
+        } elseif ($parentId === "000") {
             if ($showAllServices == "1") {
                 $output = $serviceBodies;
             } else {
@@ -196,9 +276,9 @@ class Helpers
                     }
                 }
             }
-        } elseif (isset($parentId) && is_numeric($parentId)) {
+        } elseif ($parentIds) {
             foreach ($serviceBodies as $serviceBody) {
-                if ($serviceBody['parent_id'] == $parentId || $serviceBody['id'] == $parentId) {
+                if (in_array((int) $serviceBody['parent_id'], $parentIds, true) || in_array((int) $serviceBody['id'], $parentIds, true)) {
                     if ($shouldAddToOutput($serviceBody)) {
                         $output[] = $serviceBody;
                     }
@@ -256,21 +336,74 @@ class Helpers
      * @param array $locations An array of location data, each represented as an associative array.
      * @param mixed $services The service body identifier to filter the location data.
      * @param string $dataFieldKey The key indicating the location data field to extract and format.
+     * @param bool $groupByState (optional) Whether to group the locations by state, one line per state.
      *
      * @return string A comma-separated string of unique, formatted locations filtered by service bodies.
+     *                When grouped by state, each state is an HTML line prefixed with the state name.
      */
-    public function getLocationsList(array $locations, $services, string $dataFieldKey): string
+    public function getLocationsList(array $locations, $services, string $dataFieldKey, bool $groupByState = false): string
     {
         $filteredData = array_filter($locations, function ($item) use ($services) {
             return isset($item['service_body_bigint']) && $item['service_body_bigint'] == $services;
         });
 
-        $uniqueLocations = array_unique(array_map(function ($value) use ($dataFieldKey) {
-            return trim(ucwords(str_replace('.', '', strtolower($value[$dataFieldKey]))));
-        }, $filteredData));
+        if (!$groupByState) {
+            $uniqueLocations = array_unique(array_map(function ($value) use ($dataFieldKey) {
+                return $this->formatLocation($value[$dataFieldKey] ?? '');
+            }, $filteredData));
 
-        $uniqueLocations = array_filter($uniqueLocations);
-        asort($uniqueLocations);
-        return implode(', ', $uniqueLocations);
+            $uniqueLocations = array_filter($uniqueLocations);
+            asort($uniqueLocations);
+            return implode(', ', $uniqueLocations);
+        }
+
+        $grouped = [];
+        foreach ($filteredData as $item) {
+            $location = $this->formatLocation($item[$dataFieldKey] ?? '');
+            if ($location !== '') {
+                $grouped[$this->getStateName($item['location_province'] ?? '')][$location] = $location;
+            }
+        }
+
+        // Sort states by name, keeping locations without a state last
+        uksort($grouped, function ($a, $b) {
+            return (($a === '') <=> ($b === '')) ?: strnatcasecmp($a, $b);
+        });
+
+        $lines = [];
+        foreach ($grouped as $state => $stateLocations) {
+            asort($stateLocations);
+            $line = esc_html(implode(', ', $stateLocations));
+            if ($state !== '') {
+                $line = '<span class="bmlt_simple_contacts_locations_state_name">' . esc_html($state) . ':</span> ' . $line;
+            }
+            $lines[] = '<span class="bmlt_simple_contacts_locations_state">' . $line . '</span>';
+        }
+        return implode('<br>', $lines);
+    }
+
+    /**
+     * Normalize a location value for display.
+     *
+     * @param mixed $value The raw location value from the root server.
+     * @return string The trimmed, title cased location without periods.
+     */
+    private function formatLocation($value): string
+    {
+        return trim(ucwords(str_replace('.', '', strtolower((string) $value))), " \t\n\r\0\x0B,");
+    }
+
+    /**
+     * Get the display name for a state or province.
+     *
+     * US abbreviations such as "NC" or "N.C." are expanded to their full name, anything else is title cased.
+     *
+     * @param mixed $province The location_province value from the root server.
+     * @return string The state name, or an empty string if none is set.
+     */
+    public function getStateName($province): string
+    {
+        $abbreviation = strtoupper(str_replace('.', '', trim((string) $province)));
+        return self::STATE_NAMES[$abbreviation] ?? ucwords(strtolower(trim((string) $province)));
     }
 }

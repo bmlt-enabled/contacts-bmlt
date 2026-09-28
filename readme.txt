@@ -4,8 +4,8 @@ Contributors: pjaudiomv, bmltenabled
 Plugin URI: https://wordpress.org/plugins/contacts-bmlt/
 Tags: bmlt, basic meeting list toolbox, Contacts, narcotics anonymous, na
 Requires PHP: 8.0
-Tested up to: 6.3.2
-Stable tag: 1.3.2
+Tested up to: 7.1.2
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -15,7 +15,7 @@ Contacts BMLT is a plugin that displays helpline and website information about s
 
 SHORTCODE
 Basic: [contacts_bmlt]
-Attributes: root_server, display_type, parent_id, show_description, show_email, show_url_in_name, show_tel_url, show_full_url, show_all_services, show_locations
+Attributes: root_server, display_type, parent_id, show_description, show_email, show_url_in_name, show_tel_url, show_full_url, show_all_services, show_locations, services, group_by_state
 
 -- Most Shortcode parameters can be combined
 
@@ -28,8 +28,11 @@ Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot;]
 **display_type** To change the display type add display_type=&quot;table&quot; there are two different types **table**, **block** the default is table.
 Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; display_type=&quot;table&quot;]
 
-**parent_id** This will only display service bodies who has set parent_id.
+**parent_id** This will only display service bodies who has set parent_id. Multiple parents can be separated by a comma.
 Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; parent_id=&quot;22&quot;]
+
+**services** This will only display the exact service bodies listed, child service bodies are not included. Overrides parent_id.
+Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;12,34,56&quot;]
 
 **show_description** This will display the service bodies description underneath the name if set.
 Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_description=&quot;1&quot;]
@@ -51,6 +54,11 @@ Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; sh
 
 **show_locations** This will display a list of locations below the service body name. Accepted values are location_neighborhood, location_city_subsection, location_municipality, location_sub_province.
 Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_locations=&quot;location_municipality&quot;]
+
+**group_by_state** When used with show_locations this will group the locations by state, one line per state. US state abbreviations are displayed as the full state name.
+Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_locations=&quot;location_municipality&quot; group_by_state=&quot;1&quot;]
+
+**Caching** Responses from the root server are cached for one hour. The cache is cleared whenever settings are saved. The duration can be changed with the contacts_bmlt_cache_ttl filter, returning 0 disables caching.
 
 
 == EXAMPLES ==
@@ -77,6 +85,14 @@ This section describes how to install the plugin and get it working.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.4.0 =
+
+* Added services attribute and setting to display an exact list of service bodies.
+* parent_id now accepts a comma separated list.
+* Added group_by_state option to group locations by state.
+* Root server responses are now cached for one hour, cleared when settings are saved.
+* Fixed duplicate locations when a location on the root server ends with a comma.
 
 = 1.3.2 =
 

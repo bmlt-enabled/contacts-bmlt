@@ -4,7 +4,7 @@
     <h3 class="help-accordian"><strong>Basic</strong></h3>
     <div>
         <p>[contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot;]</p>
-        <strong>Attributes:</strong> root_server, display_type, parent_id, show_description, show_email, show_url_in_name, show_tel_url, show_full_url, show_all_services, show_locations
+        <strong>Attributes:</strong> root_server, display_type, parent_id, show_description, show_email, show_url_in_name, show_tel_url, show_full_url, show_all_services, show_locations, services, group_by_state
         <p><strong>Most Shortcode parameters can be combined.</strong></p>
     </div>
     <h3 class="help-accordian"><strong>Shortcode Attributes</strong></h3>
@@ -20,6 +20,8 @@
         <p><strong>show_full_url</strong></p>
         <p><strong>show_all_services</strong></p>
         <p><strong>show_locations</strong></p>
+        <p><strong>services</strong></p>
+        <p><strong>group_by_state</strong></p>
         <p>A minimum of root_server attribute is required.</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot;]</p>
     </div>
@@ -38,7 +40,7 @@
     <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;- parent_id</strong></h3>
     <div>
         <p><strong>parent_id</strong></p>
-        <p>This will only display service bodies who has set parent_id.</p>
+        <p>This will only display service bodies who has set parent_id. Multiple parents can be separated by a comma.</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; parent_id=&quot;22&quot;]</p>
     </div>
     <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;- show_description</strong></h3>
@@ -82,5 +84,17 @@
         <p><strong>show_locations</strong></p>
         <p>This will display a list of locations below the service body name. Accepted values are location_neighborhood, location_city_subsection, location_municipality, location_sub_province.</p>
         <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_locations=&quot;location_municipality"]</p>
+    </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;- services</strong></h3>
+    <div>
+        <p><strong>services</strong></p>
+        <p>This will only display the exact service bodies listed, child service bodies are not included. Overrides parent_id.</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;12,34,56&quot;]</p>
+    </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;- group_by_state</strong></h3>
+    <div>
+        <p><strong>group_by_state</strong></p>
+        <p>When used with show_locations this will group the locations by state, one line per state. US state abbreviations are displayed as the full state name.</p>
+        <p>Ex. [contacts_bmlt root_server=&quot;https://www.domain.org/main_server&quot; show_locations=&quot;location_municipality&quot; group_by_state=&quot;1&quot;]</p>
     </div>
 </div>
